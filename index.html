@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECMO Scenario Simulator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for Inter font and general body styling */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Adorable background gradient */
+            background: linear-gradient(to bottom right, #e0f7fa, #bbdefb); /* Soft blue gradient */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Ensure it takes full viewport height */
+            padding: 1.5rem; /* Increased padding */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+        /* Main container styling */
+        .container {
+            background-color: #ffffff;
+            padding: 3rem; /* More generous padding */
+            border-radius: 2rem; /* Even more rounded corners */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15); /* Deeper, softer shadow */
+            max-width: 950px; /* Slightly wider for better content display */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem; /* Increased space between sections */
+            border: 1px solid #e0e0e0; /* Subtle border */
+        }
+        /* Heading and intro text styling */
+        h1 {
+            color: #2c3e50; /* Darker, more professional blue-gray */
+            font-size: 2.5rem; /* Larger heading */
+            margin-bottom: 0.75rem;
+        }
+        .intro-text {
+            color: #55606e; /* Slightly lighter text for intro */
+            font-size: 1.15rem;
+            line-height: 1.7;
+        }
+        .disclaimer {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 0.5rem;
+        }
+
+        /* Input group styling - now for gauges */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center content horizontally */
+            gap: 0.6rem;
+            text-align: center;
+        }
+        .input-group label {
+            font-weight: 700;
+            color: #34495e;
+            font-size: 1rem;
+            margin-bottom: 0.5rem; /* Space below label */
+        }
+
+        /* Gauge specific styles */
+        .gauge-container {
+            width: 120px; /* Fixed width for consistency */
+            height: 80px; /* Fixed height for consistency */
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+        .gauge-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible; /* Allow needle to extend */
+        }
+        .gauge-track {
+            fill: none;
+            stroke: #e0e0e0;
+            stroke-width: 8;
+        }
+        .gauge-fill {
+            fill: none;
+            stroke-width: 8;
+            transition: stroke 0.3s ease-in-out;
+        }
+        .gauge-needle {
+            fill: #34495e;
+            transform-origin: 50% 100%; /* Pivot point at the bottom center */
+            transition: transform 0.3s ease-in-out;
+        }
+        .gauge-value-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            fill: #34495e;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        /* Color mapping for qualitative states */
+        .color-normal { stroke: #2ecc71; } /* Green */
+        .color-increased { stroke: #e67e22; } /* Orange */
+        .color-decreased { stroke: #f1c40f; } /* Yellow */
+        .color-severely_decreased { stroke: #e74c3c; } /* Red */
+        .color-zero { stroke: #95a5a6; } /* Gray */
+
+        /* Results area styling */
+        #results {
+            background-color: #fcfdff; /* Very light, almost white for results */
+            padding: 2rem; /* More padding */
+            border-radius: 1.5rem; /* Rounded corners */
+            border: 2px dashed #a7d9f7; /* More distinct dashed border */
+            min-height: 180px; /* Increased minimum height */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Align text to start */
+            text-align: left; /* Align text to left */
+            color: #34495e;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Subtle shadow for results box */
+        }
+        #results p {
+            margin-bottom: 0.75rem; /* More space between paragraphs */
+        }
+        #results strong {
+            color: #2980b9; /* Stronger blue for emphasis */
+        }
+        #results .scenario-name {
+            font-size: 1.8rem; /* Larger scenario name */
+            font-weight: 800; /* Extra bold */
+            color: #34495e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem; /* Space between name and graphic */
+        }
+        #results .scenario-graphic {
+            font-size: 2.2rem; /* Larger emoji */
+            line-height: 1; /* Align emoji vertically */
+        }
+        #results .scenario-description {
+            color: #55606e;
+            margin-bottom: 1rem;
+        }
+        #results .full-description {
+            display: none; /* Hidden by default */
+        }
+        #results .read-more-btn {
+            background-color: #6a82fb; /* Attractive button color */
+            color: #ffffff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border: none; /* No border for a cleaner look */
+            margin-top: 0.5rem; /* Space above button */
+        }
+        #results .read-more-btn:hover {
+            background-color: #5a6edc; /* Darker shade on hover */
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        #results hr {
+            border-color: #cfd8dc; /* Lighter divider */
+            margin: 1.5rem 0; /* More vertical space for divider */
+        }
+
+        /* Responsive grid for inputs */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Responsive columns */
+            gap: 1.5rem; /* Space between grid items */
+        }
+
+        /* Flowchart specific styling */
+        .flowchart-section {
+            background-color: #e8f5e9; /* Light green background */
+            padding: 1.2rem;
+            border-radius: 0.75rem;
+            border: 1px solid #c8e6c9;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            text-align: left;
+        }
+        .flowchart-section h4 {
+            font-weight: 700;
+            color: #388e3c; /* Darker green heading */
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+        .flowchart-step {
+            margin-bottom: 0.5rem;
+        }
+        .flowchart-question {
+            font-weight: 600;
+            color: #424242;
+        }
+        .flowchart-answer {
+            margin-left: 1.5rem;
+            position: relative;
+        }
+        .flowchart-answer::before {
+            content: '↳'; /* Arrow symbol */
+            position: absolute;
+            left: -1rem;
+            color: #607d8b;
+        }
+        .flowchart-result {
+            font-weight: 700;
+            color: #1976d2; /* Blue for results */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">ECMO Scenario Simulator</h1>
+        <p class="intro-text text-center">
+            Select a predefined scenario to see its characteristic parameter trends and potential complications.
+        </p>
+        <p class="disclaimer text-center">
+            (All values are illustrative and for educational purposes only. Consult medical professionals for actual patient care.)
+        </p>
+
+        <div class="input-group mb-6">
+            <label for="scenarioSelect">Select a Predefined Scenario:</label>
+            <select id="scenarioSelect">
+                <option value="normal_operation">Normal Operation (Baseline)</option>
+                <option value="membrane_clot">Membrane Lung Clot / Oxygenator Failure</option>
+                <option value="hypovolemia">Hypovolemia / Access Insufficiency</option>
+                <option value="access_kink">Access Cannula Kink</option>
+                <option value="return_kink">Return Cannula Kink / Distal Obstruction</option>
+                <option value="air_in_circuit">Air in Access Circuit</option>
+                <option value="impending_pump_failure">Impending Pump Failure</option>
+                <option value="circuit_rupture">Circuit Rupture / Disconnection</option>
+                <option value="access_cannula_clot">Clot in Access Cannula</option>
+                <option value="return_cannula_clot">Clot in Return Cannula</option>
+                <option value="power_failure">Power Failure</option>
+                <option value="custom">Custom Input</option>
+            </select>
+        </div>
+
+        <div class="input-grid">
+            <div class="input-group">
+                <label>P1 (Pre-pump Pressure)</label>
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 100 60">
+                        <path id="p1-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
+                        <path id="p1-fill" class="gauge-fill" d="M10 50 A 40 40 0 0 1 90 50" />
+                        <polygon id="p1-needle" class="gauge-needle" points="48,50 52,50 50,15" />
+                        <text id="p1-value" class="gauge-value-text" x="50" y="50"></text>
+                    </svg>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>P2 (Post-pump Pressure)</label>
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 100 60">
+                        <path id="p2-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
+                        <path id="p2-fill" class="gauge-fill" d="M10 50 A 40 40 0 0 1 90 50" />
+                        <polygon id="p2-needle" class="gauge-needle" points="48,50 52,50 50,15" />
+                        <text id="p2-value" class="gauge-value-text" x="50" y="50"></text>
+                    </svg>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>P3 (Post-oxygenator Pressure)</label>
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 100 60">
+                        <path id="p3-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
+                        <path id="p3-fill" class="gauge-fill" d="M10 50 A 40 40 0 0 1 90 50" />
+                        <polygon id="p3-needle" class="gauge-needle" points="48,50 52,50 50,15" />
+                        <text id="p3-value" class="gauge-value-text" x="50" y="50"></text>
+                    </svg>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Delta Pressure (P2-P3)</label>
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 100 60">
+                        <path id="deltaP-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
+                        <path id="deltaP-fill" class="gauge-fill" d="M10 50 A 40 40 0 0 1 90 50" />
+                        <polygon id="deltaP-needle" class="gauge-needle" points="48,50 52,50 50,15" />
+                        <text id="deltaP-value" class="gauge-value-text" x="50" y="50"></text>
+                    </svg>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Flow</label>
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 100 60">
+                        <path id="flow-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
+                        <path id="flow-fill" class="gauge-fill" d="M10 50 A 40 40 0 0 1 90 50" />
+                        <polygon id="flow-needle" class="gauge-needle" points="48,50 52,50 50,15" />
+                        <text id="flow-value" class="gauge-value-text" x="50" y="50"></text>
+                    </svg>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>RPM</label>
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 100 60">
+                        <path id="rpm-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
+                        <path id="rpm-fill" class="gauge-fill" d="M10 50 A 40 40 0 0 1 90 50" />
+                        <polygon id="rpm-needle" class="gauge-needle" points="48,50 52,50 50,15" />
+                        <text id="rpm-value" class="gauge-value-text" x="50" y="50"></text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div id="results" class="mt-8">
+            <p>Select a scenario from the dropdown above to see its characteristic trends and potential complications.</p>
+        </div>
+    </div>
+
+    <script>
+        // Get references to DOM elements
+        const scenarioSelect = document.getElementById('scenarioSelect');
+        const resultsDiv = document.getElementById('results');
+
+        // References to gauge elements
+        const gauges = {
+            p1: { needle: document.getElementById('p1-needle'), fill: document.getElementById('p1-fill'), valueText: document.getElementById('p1-value') },
+            p2: { needle: document.getElementById('p2-needle'), fill: document.getElementById('p2-fill'), valueText: document.getElementById('p2-value') },
+            p3: { needle: document.getElementById('p3-needle'), fill: document.getElementById('p3-fill'), valueText: document.getElementById('p3-value') },
+            deltaP: { needle: document.getElementById('deltaP-needle'), fill: document.getElementById('deltaP-fill'), valueText: document.getElementById('deltaP-value') },
+            flow: { needle: document.getElementById('flow-needle'), fill: document.getElementById('flow-fill'), valueText: document.getElementById('flow-value') },
+            rpm: { needle: document.getElementById('rpm-needle'), fill: document.getElementById('rpm-fill'), valueText: document.getElementById('rpm-value') },
+        };
+
+        // Define predefined scenarios with full and short descriptions, qualitative parameters, AND diagnostic algorithms
+        const scenarios = {
+            "custom": {
+                name: "Custom Input",
+                shortDescription: "Manually set the trends for all parameters to explore various combinations.",
+                fullDescription: "This mode allows you to freely adjust the qualitative trends for P1, P2, P3, Delta P, Flow, and RPM. It's ideal for testing specific hypothetical scenarios or for understanding the individual impact of each parameter change. Remember that some combinations may represent highly critical or impossible circuit states.",
+                graphic: "📊",
+                params: { p1: 'normal', p2: 'normal', p3: 'normal', deltaP: 'normal', flow: 'normal', rpm: 'normal' },
+                algorithm: null // No specific algorithm for custom input
+            },
+            "normal_operation": {
+                name: "Normal Operation (Baseline)",
+                shortDescription: "Represents a healthy, stable ECMO circuit with all parameters within expected normal ranges.",
+                fullDescription: "In a normal ECMO operation, the pump efficiently draws blood (normal P1), pushes it through the oxygenator (normal P2 and P3, normal Delta P), and returns it to the patient at the desired flow rate with stable RPM. This indicates optimal physiological support and circuit integrity.",
+                graphic: "✅",
+                params: { p1: 'normal', p2: 'normal', p3: 'normal', deltaP: 'normal', flow: 'normal', rpm: 'normal' },
+                algorithm: null // No specific algorithm for normal operation
+            },
+            "membrane_clot": {
+                name: "Membrane Lung Clot / Oxygenator Failure",
+                shortDescription: "A clot in the oxygenator increases resistance, leading to increased P2, decreased P3, high Delta P, and decreased flow.",
+                fullDescription: "When a clot forms within the oxygenator, it obstructs blood flow, increasing the pressure required to push blood into it (increased P2). Simultaneously, the pressure beyond the oxygenator drops (decreased P3) due to the increased resistance. This creates a significant increase in the pressure difference across the oxygenator (Delta P). Despite the pump maintaining its RPM, the overall blood flow through the circuit decreases.",
+                graphic: "🛑",
+                params: { p1: 'normal', p2: 'increased', p3: 'decreased', deltaP: 'increased', flow: 'decreased', rpm: 'normal' },
+                algorithm: `
+                    <div class="flowchart-section">
+                        <h4>Diagnostic Algorithm (Flowchart)</h4>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">1. Is Delta Pressure (P2-P3) Increased?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other complications.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">2. Is Flow Decreased?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Re-evaluate parameters.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Is RPM Normal?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>Likely: Oxygenator Clotting/Failure.</strong>
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider pump issues or other factors.
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            "hypovolemia": {
+                name: "Hypovolemia / Access Insufficiency",
+                shortDescription: "Low blood volume leads to severely decreased P1 and decreased flow, despite normal RPM.",
+                fullDescription: "In hypovolemia, the patient lacks sufficient circulating blood volume for the ECMO pump to draw. The pump 'sucks dry' or 'cavitates', causing the pre-pump pressure (P1) to become severely negative. This 'chattering' can damage blood components. Despite the pump running at its set RPM, the actual blood flow through the circuit significantly decreases because there's not enough blood to fill the circuit.",
+                graphic: "💧",
+                params: { p1: 'severely_decreased', p2: 'normal', p3: 'normal', deltaP: 'normal', flow: 'decreased', rpm: 'normal' },
+                algorithm: `
+                    <div class="flowchart-section">
+                        <h4>Diagnostic Algorithm (Flowchart)</h4>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">1. Is P1 Severely Decreased?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other complications.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">2. Is Flow Decreased?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Re-evaluate parameters.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Is RPM Normal?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>Likely: Hypovolemia / Access Insufficiency.</strong>
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider pump issues or other factors.
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            "access_kink": {
+                name: "Access Cannula Kink",
+                shortDescription: "A kink in the access cannula causes severely decreased P1 and decreased flow at normal RPM.",
+                fullDescription: "A physical kink or obstruction in the access cannula restricts blood flow from the patient to the ECMO circuit. This creates a high vacuum effect before the pump, causing P1 to drop severely (become very negative). Similar to hypovolemia, the pump struggles to pull blood, leading to a significant reduction in overall circuit flow, even if the pump's RPM remains constant.",
+                graphic: "➰",
+                params: { p1: 'severely_decreased', p2: 'normal', p3: 'normal', deltaP: 'normal', flow: 'decreased', rpm: 'normal' },
+                algorithm: `
+                    <div class="flowchart-section">
+                        <h4>Diagnostic Algorithm (Flowchart)</h4>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">1. Is P1 Severely Decreased?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other complications.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">2. Is Flow Decreased?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Re-evaluate parameters.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Is RPM Normal?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>Likely: Access Cannula Kink.</strong> (Visually inspect cannula)
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider pump issues or other factors.
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            "return_kink": {
+                name: "Return Cannula Kink / Distal Obstruction",
+                shortDescription: "An obstruction in the return limb causes increased P3, increased P2, and decreased flow at normal RPM, with normal Delta P.",
+                fullDescription: "An obstruction in the return cannula or the patient's vasculature (e.g., severe vasoconstriction, cannula malposition) impedes the return of oxygenated blood to the patient. This causes pressure to build up in the return limb (increased P3). The increased resistance can also lead to an increase in P2 as the entire circuit experiences increased back pressure. If P2 and P3 increase proportionally, the Delta P across the oxygenator may remain relatively normal. Overall circuit flow will decrease even if the pump's RPM is unchanged.",
+                graphic: "↩️",
+                params: { p1: 'normal', p2: 'increased', p3: 'increased', deltaP: 'normal', flow: 'decreased', rpm: 'normal' },
+                algorithm: `
+                    <div class="flowchart-section">
+                        <h4>Diagnostic Algorithm (Flowchart)</h4>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">1. Is P3 Increased?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other complications.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">2. Is P2 Increased AND Delta P Normal?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider oxygenator issues if Delta P is high.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Is Flow Decreased AND RPM Normal?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>Likely: Return Cannula Kink / Distal Obstruction.</strong> (Visually inspect cannula, assess patient)
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Re-evaluate.
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            "air_in_circuit": {
+                name: "Air in Access Circuit",
+                shortDescription: "Air causes P1 to severely decrease (chattering), leading to critically low and erratic flow.",
+                fullDescription: "Air entering the access limb of the ECMO circuit causes the pump to cavitate or 'chatter'. This results in wildly fluctuating and often severely negative P1 readings. The presence of air significantly reduces the pump's efficiency, leading to a critically low, unstable, and often erratic blood flow, even with the pump running at normal RPM.",
+                graphic: "💨",
+                params: { p1: 'severely_decreased', p2: 'decreased', p3: 'decreased', deltaP: 'normal', flow: 'severely_decreased', rpm: 'normal' },
+                algorithm: `
+                    <div class="flowchart-section">
+                        <h4>Diagnostic Algorithm (Flowchart)</h4>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">1. Is P1 Severely Decreased (and potentially fluctuating)?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other complications.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">2. Is Flow Critically Low?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Re-evaluate.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Is RPM Normal?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>Likely: Air in Access Circuit.</strong> (Visually inspect circuit for air)
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider pump issues or other factors.
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            "impending_pump_failure": {
+                name: "Impending Pump Failure",
+                shortDescription: "Flow decreases despite normal RPM, with P2 and P3 potentially decreasing as pump efficiency drops.",
+                fullDescription: "If the ECMO pump itself begins to fail (e.g., motor issues, bearing wear), its ability to generate pressure and flow diminishes. This is characterized by a decrease in overall circuit flow despite the pump maintaining its set RPM. P2 and P3 may also decrease as the pump can no longer effectively push blood through the circuit. This scenario requires immediate attention and potential pump change-out.",
+                graphic: "⚙️",
+                params: { p1: 'normal', p2: 'decreased', p3: 'decreased', deltaP: 'normal', flow: 'decreased', rpm: 'normal' },
+                algorithm: `
+                    <div class="flowchart-section">
+                        <h4>Diagnostic Algorithm (Flowchart)</h4>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">1. Is Flow Decreased?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other complications.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">2. Is RPM Normal?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Re-evaluate parameters.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Are P2 and P3 Decreased AND Delta P Normal?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>Likely: Impending Pump Failure.</strong> (Prepare for pump change)
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider circuit rupture or other issues.
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            "circuit_rupture": {
+                name: "Circuit Rupture / Disconnection",
+                shortDescription: "Catastrophic event: P2 & P3 decrease rapidly, flow drops to zero, and RPM remains high.",
+                fullDescription: "A circuit rupture or accidental disconnection is a critical emergency. Blood rapidly leaks from the circuit, causing a sudden and drastic drop in P2 and P3 (often to ambient pressure). The flow will immediately drop to zero, while the pump, no longer encountering resistance, may continue to spin at its set RPM, potentially leading to cavitation or air entrainment. This requires immediate clamping and intervention.",
+                graphic: "⚠️",
+                params: { p1: 'normal', p2: 'decreased', p3: 'decreased', deltaP: 'normal', flow: 'zero', rpm: 'normal' },
+                algorithm: `
+                    <div class="flowchart-section">
+                        <h4>Diagnostic Algorithm (Flowchart)</h4>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">1. Is Flow Zero?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other complications.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">2. Is RPM Normal?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider power failure if RPM is zero.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Are P2 and P3 Decreased?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>Likely: Circuit Rupture / Disconnection.</strong> (IMMEDIATE CLAMPING & INTERVENTION)
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Re-evaluate.
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            "access_cannula_clot": {
+                name: "Clot in Access Cannula",
+                shortDescription: "A clot in the access cannula causes severely decreased P1 and significantly decreased flow.",
+                fullDescription: "A thrombus (clot) forming directly within the access cannula creates a significant obstruction, severely limiting the amount of blood that can be drawn into the ECMO circuit. This leads to a marked drop in P1 (more negative pressure) and a significant reduction in overall circuit flow, even with the pump running at its normal RPM. This can be a precursor to more widespread circuit clotting.",
+                graphic: "🩸",
+                params: { p1: 'severely_decreased', p2: 'normal', p3: 'normal', deltaP: 'normal', flow: 'decreased', rpm: 'normal' },
+                algorithm: `
+                    <div class="flowchart-section">
+                        <h4>Diagnostic Algorithm (Flowchart)</h4>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">1. Is P1 Severely Decreased?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other complications.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">2. Is Flow Decreased?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Re-evaluate.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Are P2, P3, and Delta P Normal?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>Likely: Clot in Access Cannula.</strong> (Visually inspect cannula, assess patient volume)
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider hypovolemia or other access issues.
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            "return_cannula_clot": {
+                name: "Clot in Return Cannula",
+                shortDescription: "A clot in the return cannula causes increased P3, increased P2, and decreased flow.",
+                fullDescription: "A thrombus (clot) in the return cannula obstructs the flow of oxygenated blood back to the patient. This causes pressure to build up significantly in the return limb (increased P3). The increased resistance propagates backward through the circuit, often leading to an increase in P2 as well. Despite the pump maintaining its RPM, the overall circuit flow will decrease due to the downstream obstruction.",
+                graphic: "🩸",
+                params: { p1: 'normal', p2: 'increased', p3: 'increased', deltaP: 'normal', flow: 'decreased', rpm: 'normal' },
+                algorithm: `
+                    <div class="flowchart-section">
+                        <h4>Diagnostic Algorithm (Flowchart)</h4>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">1. Is P3 Increased?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other complications.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">2. Is P2 Increased AND Delta P Normal?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider oxygenator issues if Delta P is high.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Is Flow Decreased AND RPM Normal?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>Likely: Clot in Return Cannula.</strong> (Visually inspect cannula, assess patient)
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Re-evaluate.
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            "power_failure": {
+                name: "Power Failure",
+                shortDescription: "Sudden loss of power stops the pump, leading to zero RPM, zero flow, decreased P2/P3, and potentially increased P1.",
+                fullDescription: "A power failure to the ECMO pump results in an immediate cessation of pump activity. This is characterized by RPM dropping to zero and flow stopping (zero flow). Without the pump actively driving blood, the pressures within the circuit (P2 and P3) will rapidly decrease as the system equalizes. P1 may increase as the 'pull' from the pump disappears and venous pressure may passively fill the access line.",
+                graphic: "🔌",
+                params: { p1: 'increased', p2: 'decreased', p3: 'decreased', deltaP: 'decreased', flow: 'zero', rpm: 'zero' },
+                algorithm: `
+                    <div class="flowchart-section">
+                        <h4>Diagnostic Algorithm (Flowchart)</h4>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">1. Is RPM Zero?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other complications.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">2. Is Flow Zero?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Re-evaluate.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Are P2 and P3 Decreased, AND P1 Increased?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>Likely: Power Failure.</strong> (Check power source, hand crank if needed)
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider pump malfunction or other causes of pump stop.
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        /**
+         * Updates a single gauge's needle position, fill color, and text value.
+         * @param {Object} gauge - The gauge object (needle, fill, valueText SVG elements).
+         * @param {string} trend - The qualitative trend ('normal', 'increased', 'decreased', 'severely_decreased', 'zero').
+         */
+        function updateGauge(gauge, trend) {
+            let rotation = 0; // Degrees from the start (left) of the arc
+            let fillColorClass = '';
+            let displayValue = trend.replace('_', ' ').toUpperCase();
+
+            // Map trend to rotation and color class
+            switch (trend) {
+                case 'severely_decreased':
+                    rotation = -45; // Further left
+                    fillColorClass = 'color-severely_decreased';
+                    break;
+                case 'decreased':
+                    rotation = -22.5; // Left of center
+                    fillColorClass = 'color-decreased';
+                    break;
+                case 'normal':
+                    rotation = 0; // Center
+                    fillColorClass = 'color-normal';
+                    break;
+                case 'increased':
+                    rotation = 22.5; // Right of center
+                    fillColorClass = 'color-increased';
+                    break;
+                case 'zero':
+                    rotation = -45; // Extreme left for zero
+                    fillColorClass = 'color-zero';
+                    displayValue = 'ZERO';
+                    break;
+                default:
+                    rotation = 0;
+                    fillColorClass = 'color-normal';
+                    break;
+            }
+
+            gauge.needle.style.transform = `rotate(${rotation}deg)`;
+            gauge.fill.className.baseVal = `gauge-fill ${fillColorClass}`; // Update fill color class
+            gauge.valueText.textContent = displayValue;
+        }
+
+
+        /**
+         * Analyzes the ECMO parameters (all qualitative trends)
+         * and determines potential complications based on predefined patterns.
+         * This is a simplified model for educational purposes.
+         * @param {string} p1Trend - Trend of Pre-pump pressure.
+         * @param {string} p2Trend - Trend of Post-pump pressure.
+         * @param {string} p3Trend - Trend of Post-oxygenator pressure.
+         * @param {string} deltaPTrend - Trend of Delta Pressure (P2-P3).
+         * @param {string} flowTrend - Trend of Flow.
+         * @param {string} rpmTrend - Trend of RPM.
+         * @returns {string} - A description of the scenario and potential complications.
+         */
+        function analyzeECMOScenario(p1Trend, p2Trend, p3Trend, deltaPTrend, flowTrend, rpmTrend) {
+            let complications = [];
+            let analysisPoints = [];
+
+            // General analysis based on individual trends
+            if (p1Trend === 'severely_decreased') {
+                analysisPoints.push("P1 is severely decreased (highly negative), indicating significant issues with venous return.");
+                complications.push("Severe Access Insufficiency (e.g., patient hypovolemia, cannula malposition/kink, chattering, clot in access cannula).");
+            } else if (p1Trend === 'decreased') {
+                analysisPoints.push("P1 is decreased (negative or low), suggesting some difficulty with venous return.");
+                complications.push("Moderate Access Insufficiency (e.g., hypovolemia, mild cannula malposition).");
+            } else if (p1Trend === 'increased') {
+                analysisPoints.push("P1 is increased, possibly due to increased systemic venous pressure or cannula obstruction.");
+            }
+
+            if (p2Trend === 'increased') {
+                analysisPoints.push("P2 is increased, indicating high resistance after the pump, before the oxygenator.");
+                complications.push("High Post-Pump Pressure (potential oxygenator clotting/failure, pre-oxygenator kink, or high resistance in return limb).");
+            } else if (p2Trend === 'decreased') {
+                analysisPoints.push("P2 is decreased, suggesting a severe leak, pump malfunction, or severe access issue leading to pump 'sucking air'.");
+                complications.push("Low Post-Pump Pressure (possible severe leak, pump malfunction, or severe access issue leading to pump 'sucking air').");
+            }
+
+            if (p3Trend === 'increased') {
+                analysisPoints.push("P3 is increased, indicating high resistance in the return line to the patient.");
+                complications.push("High Return Pressure (return limb obstruction, cannula malposition, kinking, severe vasoconstriction, or clot in return cannula).");
+            } else if (p3Trend === 'decreased') {
+                analysisPoints.push("P3 is decreased, suggesting issues with blood returning to the patient.");
+                complications.push("Low Return Pressure (return cannula dislodgement, severe vasodilation, or large air embolism in return, or circuit rupture).");
+            }
+
+            if (deltaPTrend === 'increased') {
+                analysisPoints.push("Delta Pressure (P2-P3) is increased, indicating increased resistance across the oxygenator.");
+                complications.push("Increased Oxygenator Resistance (strong indicator of oxygenator clotting or membrane failure).");
+            } else if (deltaPTrend === 'decreased') {
+                analysisPoints.push("Delta Pressure (P2-P3) is decreased, suggesting reduced resistance across the oxygenator or altered flow dynamics.");
+                complications.push("Decreased Oxygenator Resistance (possible oxygenator bypass, circuit leak, or measurement error).");
+            }
+
+            if (flowTrend === 'zero') {
+                analysisPoints.push("Flow is zero or near zero, indicating a critical flow stoppage.");
+                complications.push("Critical Flow Stoppage (e.g., circuit rupture, severe air lock, complete pump failure, total access/return occlusion).");
+            } else if (flowTrend === 'severely_decreased') {
+                analysisPoints.push("Flow is critically low.");
+                complications.push("Critically Low Flow (immediate investigation required for severe access issue, major clot, or pump failure).");
+            } else if (flowTrend === 'decreased') {
+                analysisPoints.push("Flow is decreased.");
+                complications.push("Low Flow State (often due to access issues, oxygenator problems, or return obstruction).");
+            }
+
+            if (rpmTrend === 'increased') {
+                analysisPoints.push("RPM is increased, suggesting the pump is working harder, potentially to compensate for low flow or increased resistance.");
+                complications.push("Pump working harder, potentially to compensate for low flow or increased resistance.");
+            } else if (rpmTrend === 'decreased') {
+                analysisPoints.push("RPM is decreased, possibly due to deliberate adjustment or pump malfunction.");
+                complications.push("Pump slowing down, possibly due to deliberate adjustment or pump malfunction.");
+            } else if (rpmTrend === 'zero') {
+                analysisPoints.push("RPM is zero, indicating the pump has stopped.");
+                complications.push("Pump Stopped (e.g., power failure, pump malfunction, deliberate stop).");
+            }
+
+            // Specific Scenario Detection based on combined qualitative patterns
+            // Note: The order of unshift matters for "Likely:" diagnoses
+            // Power Failure
+            if (rpmTrend === 'zero' && flowTrend === 'zero' && p2Trend === 'decreased' && p3Trend === 'decreased' && p1Trend === 'increased' && deltaPTrend === 'decreased') {
+                complications.unshift("Likely: Power Failure to the ECMO pump.");
+            }
+            // Circuit Rupture / Disconnection
+            if (flowTrend === 'zero' && rpmTrend === 'normal' && p2Trend === 'decreased' && p3Trend === 'decreased' && deltaPTrend === 'normal') { // Delta P normal because both P2/P3 drop similarly
+                complications.unshift("Likely: Circuit Rupture / Disconnection (critical emergency).");
+            }
+            // Membrane Lung Clot / Oxygenator Failure
+            if (deltaPTrend === 'increased' && flowTrend === 'decreased' && rpmTrend === 'normal') {
+                complications.unshift("Likely: Oxygenator Clotting/Failure (high delta P across oxygenator).");
+            }
+            // Hypovolemia / Access Insufficiency (general)
+            if ((p1Trend === 'decreased' || p1Trend === 'severely_decreased') && flowTrend === 'decreased' && rpmTrend === 'normal') {
+                complications.unshift("Likely: Access Insufficiency (e.g., patient hypovolemia, cannula malposition/kink).");
+            }
+            // Clot in Access Cannula (more specific access issue)
+            if (p1Trend === 'severely_decreased' && flowTrend === 'decreased' && rpmTrend === 'normal' && p2Trend === 'normal' && p3Trend === 'normal' && deltaPTrend === 'normal') {
+                complications.unshift("Likely: Clot in Access Cannula.");
+            }
+            // Return Limb Obstruction (general)
+            if (p3Trend === 'increased' && flowTrend === 'decreased' && rpmTrend === 'normal') {
+                complications.unshift("Likely: Return Limb Obstruction (e.g., cannula kink, patient vasoconstriction).");
+            }
+            // Clot in Return Cannula (more specific return issue)
+            if (p3Trend === 'increased' && p2Trend === 'increased' && flowTrend === 'decreased' && rpmTrend === 'normal' && deltaPTrend === 'normal') { // Delta P normal if both increase proportionally
+                complications.unshift("Likely: Clot in Return Cannula.");
+            }
+            // Air in Access Circuit (often causes P1 to swing wildly, leading to 'severely_decreased' and very low flow)
+            if (p1Trend === 'severely_decreased' && flowTrend === 'severely_decreased' && rpmTrend === 'normal' && p2Trend === 'decreased' && p3Trend === 'decreased' && deltaPTrend === 'normal') {
+                complications.unshift("Likely: Severe Access Chattering / Air in Circuit (requires immediate attention).");
+            }
+            // Impending Pump Failure
+            if (flowTrend === 'decreased' && rpmTrend === 'normal' && p2Trend === 'decreased' && p3Trend === 'decreased' && p1Trend === 'normal' && deltaPTrend === 'normal') {
+                complications.unshift("Possible: Impending Pump Failure or significant circuit leak.");
+            }
+
+
+            // Construct the final message
+            let resultMessage = "<strong>Current Parameter Trends:</strong><br>";
+            resultMessage += `P1 (Pre-pump): <strong>${p1Trend.replace('_', ' ').toUpperCase()}</strong><br>`;
+            resultMessage += `P2 (Post-pump): <strong>${p2Trend.replace('_', ' ').toUpperCase()}</strong><br>`;
+            resultMessage += `P3 (Post-oxygenator): <strong>${p3Trend.replace('_', ' ').toUpperCase()}</strong><br>`;
+            resultMessage += `Delta Pressure (P2-P3): <strong>${deltaPTrend.replace('_', ' ').toUpperCase()}</strong><br>`;
+            resultMessage += `Flow: <strong>${flowTrend.replace('_', ' ').toUpperCase()}</strong><br>`;
+            resultMessage += `RPM: <strong>${rpmTrend.replace('_', ' ').toUpperCase()}</strong><br>`;
+            resultMessage += "<br>";
+
+            resultMessage += "<strong>Scenario Analysis:</strong><br>";
+            if (analysisPoints.length > 0) {
+                resultMessage += analysisPoints.join("<br>") + "<br><br>";
+            } else {
+                resultMessage += "Parameters appear within typical ranges, or no specific major deviation identified by this simplified model.<br><br>";
+            }
+
+            resultMessage += "<strong>Potential Complications:</strong><br>";
+            if (complications.length > 0) {
+                const uniqueComplications = [...new Set(complications)];
+                resultMessage += uniqueComplications.map(c => `- ${c}`).join("<br>");
+            } else {
+                resultMessage += "No immediate major complications identified based on the provided parameters. Always monitor patient clinical status and other parameters closely.";
+            }
+
+            return resultMessage;
+        }
+
+        /**
+         * Handles scenario selection from the dropdown.
+         * Populates input fields and runs simulation.
+         */
+        scenarioSelect.addEventListener('change', (event) => {
+            const selectedScenarioKey = event.target.value;
+            const scenario = scenarios[selectedScenarioKey];
+
+            if (scenario) {
+                // Update gauge visuals based on selected scenario parameters
+                updateGauge(gauges.p1, scenario.params.p1);
+                updateGauge(gauges.p2, scenario.params.p2);
+                updateGauge(gauges.p3, scenario.params.p3);
+                updateGauge(gauges.deltaP, scenario.params.deltaP);
+                updateGauge(gauges.flow, scenario.params.flow);
+                updateGauge(gauges.rpm, scenario.params.rpm);
+
+                // Generate and display the scenario information
+                let displayContent = `
+                    <p class="scenario-name">${scenario.name} <span class="scenario-graphic">${scenario.graphic}</span></p>
+                    <p class="scenario-description" id="shortDescription">${scenario.shortDescription}</p>
+                    <p class="scenario-description full-description" id="fullDescription">${scenario.fullDescription}</p>
+                    <button class="read-more-btn" id="readMoreBtn">Read More</button>
+                    <hr class="my-4">
+                `;
+
+                // Add the detailed analysis from analyzeECMOScenario
+                displayContent += analyzeECMOScenario(
+                    scenario.params.p1,
+                    scenario.params.p2,
+                    scenario.params.p3,
+                    scenario.params.deltaP,
+                    scenario.params.flow,
+                    scenario.params.rpm
+                );
+
+                resultsDiv.innerHTML = displayContent;
+
+                // Add event listener for the new Read More button
+                const readMoreBtn = document.getElementById('readMoreBtn');
+                const shortDesc = document.getElementById('shortDescription');
+                const fullDesc = document.getElementById('fullDescription');
+
+                // Append algorithm if it exists for the scenario
+                if (scenario.algorithm) {
+                    fullDesc.innerHTML += scenario.algorithm;
+                }
+
+                if (readMoreBtn) {
+                    // Only show read more button if full description (including algorithm) is longer than short
+                    // This comparison is a bit tricky with HTML content, so we'll simplify:
+                    // If there's a fullDescription OR an algorithm, show the button.
+                    const hasMoreContent = scenario.fullDescription.length > scenario.shortDescription.length || scenario.algorithm !== null;
+
+                    if (hasMoreContent) {
+                        readMoreBtn.style.display = 'block';
+                        fullDesc.style.display = 'none'; // Ensure full description is hidden initially
+                        shortDesc.style.display = 'block'; // Ensure short description is visible initially
+                    } else {
+                        readMoreBtn.style.display = 'none';
+                        fullDesc.style.display = 'block'; // If no short/long difference, show full
+                        shortDesc.style.display = 'none';
+                    }
+
+
+                    readMoreBtn.addEventListener('click', () => {
+                        if (fullDesc.style.display === 'none') {
+                            fullDesc.style.display = 'block';
+                            shortDesc.style.display = 'none';
+                            readMoreBtn.textContent = 'Show Less';
+                        } else {
+                            fullDesc.style.display = 'none';
+                            shortDesc.style.display = 'block';
+                            readMoreBtn.textContent = 'Read More';
+                        }
+                    });
+                }
+            }
+        });
+
+        // Initial simulation on load for default values
+        window.onload = function() {
+            // Set default scenario to "Normal Operation" and trigger change event
+            scenarioSelect.value = "normal_operation";
+            scenarioSelect.dispatchEvent(new Event('change'));
+        };
+    </script>
+</body>
+</html>
