@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECMO Scenario Simulator</title>
+    <title>ECMO Scenario Simulator & Quiz</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -48,6 +48,16 @@
             color: #7f8c8d;
             margin-top: 0.5rem;
         }
+        /* Developer info styling - moved to the bottom, so adjusted margin-top */
+        .developer-info {
+            font-size: 0.95rem;
+            color: #607d8b;
+            text-align: center;
+            margin-top: 2rem; /* Added margin to separate from content */
+            padding-top: 1rem; /* Padding at the top */
+            border-top: 1px solid #e0e0e0; /* A subtle line above it */
+        }
+
 
         /* Input group styling - now for gauges */
         .input-group {
@@ -215,10 +225,176 @@
             font-weight: 700;
             color: #1976d2; /* Blue for results */
         }
+
+        /* Style for the actual dropdowns when enabled for custom input */
+        .param-dropdown {
+            padding: 0.75rem 1rem; /* Comfortable padding */
+            border: 1px solid #cbd5e0; /* Light border */
+            border-radius: 0.75rem; /* Rounded input fields */
+            font-size: 1rem;
+            color: #2d3748; /* Dark text color */
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            background-color: #ffffff; /* Ensure select has white background */
+            appearance: none; /* Remove default select arrow */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234a5568%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-6.5%200-12.3%203.2-16.2%208.1-3.9%204.9-4.7%2011.4-2.1%2017.3l139.3%20139.3c3.9%203.9%209.2%206.2%2014.7%206.2s10.8-2.3%2014.7-6.2l139.3-139.3c5.4-5.9%204.6-12.4.7-17.3z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 0.8em auto;
+            width: 100%; /* Make dropdown fill its container */
+        }
+        .param-dropdown:focus {
+            outline: none;
+            border-color: #4299e1; /* Blue border on focus */
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); /* Blue glow on focus */
+        }
+        .param-dropdown:disabled {
+            background-color: #eceff1; /* Lighter background for disabled inputs */
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        /* Quiz specific styles */
+        #quiz-section {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 2rem;
+            background-color: #f8fcfd; /* Lighter background for quiz */
+            border-radius: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        #quiz-question-area {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid #e0e0e0;
+        }
+        #quiz-question-area h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #34495e;
+            margin-bottom: 1rem;
+        }
+        #quiz-vignette {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: #55606e;
+        }
+        #quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .quiz-option-btn {
+            background-color: #e3f2fd; /* Light blue option background */
+            color: #2980b9;
+            padding: 0.8rem 1.2rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            border: 1px solid #bbdefb;
+        }
+        .quiz-option-btn:hover:not(.selected):not(.correct):not(.incorrect) {
+            background-color: #bbdefb; /* Slightly darker on hover */
+            transform: translateY(-1px);
+        }
+        .quiz-option-btn.selected {
+            border-color: #6a82fb;
+            box-shadow: 0 0 0 2px rgba(106, 130, 251, 0.4);
+        }
+        .quiz-option-btn.correct {
+            background-color: #d4edda; /* Light green for correct */
+            border-color: #28a745;
+            color: #155724;
+            pointer-events: none; /* Disable after selection */
+        }
+        .quiz-option-btn.incorrect {
+            background-color: #f8d7da; /* Light red for incorrect */
+            border-color: #dc3545;
+            color: #721c24;
+            pointer-events: none; /* Disable after selection */
+        }
+        #quiz-feedback {
+            margin-top: 1rem;
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            display: none; /* Hidden by default */
+        }
+        #quiz-feedback.correct-feedback {
+            background-color: #e6ffe6;
+            color: #1a7a1a;
+            border: 1px solid #28a745;
+        }
+        #quiz-feedback.incorrect-feedback {
+            background-color: #ffe6e6;
+            color: #a71a1a;
+            border: 1px solid #dc3545;
+        }
+        #quiz-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+        .quiz-nav-btn {
+            background-color: #4299e1;
+            color: #ffffff;
+            padding: 0.7rem 1.4rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .quiz-nav-btn:hover {
+            background-color: #3182ce;
+        }
+        .quiz-nav-btn:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+        #quiz-score {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-top: 1rem;
+        }
+        #quiz-final-score {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #28a745;
+            margin-top: 1.5rem;
+        }
+        #quiz-restart-btn {
+            background-color: #2ecc71;
+            margin-top: 1rem;
+        }
+        #quiz-restart-btn:hover {
+            background-color: #27ae60;
+        }
+        #back-to-simulator-btn {
+            background-color: #607d8b;
+            color: #ffffff;
+            padding: 0.7rem 1.4rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            margin-top: 1.5rem;
+            align-self: center; /* Center the button */
+        }
+        #back-to-simulator-btn:hover {
+            background-color: #455a64;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="main-simulator-section">
         <h1 class="text-center">ECMO Scenario Simulator</h1>
         <p class="intro-text text-center">
             Select a predefined scenario to see its characteristic parameter trends and potential complications.
@@ -227,9 +403,9 @@
             (All values are illustrative and for educational purposes only. Consult medical professionals for actual patient care.)
         </p>
 
-        <div class="input-group mb-6">
-            <label for="scenarioSelect">Select a Predefined Scenario:</label>
-            <select id="scenarioSelect">
+        <div class="input-group mb-6 flex-row justify-between items-center">
+            <label for="scenarioSelect" class="mb-0">Select a Predefined Scenario:</label>
+            <select id="scenarioSelect" class="param-dropdown w-2/3">
                 <option value="normal_operation">Normal Operation (Baseline)</option>
                 <option value="membrane_clot">Membrane Lung Clot / Oxygenator Failure</option>
                 <option value="hypovolemia">Hypovolemia / Access Insufficiency</option>
@@ -243,11 +419,12 @@
                 <option value="power_failure">Power Failure</option>
                 <option value="custom">Custom Input</option>
             </select>
+            <button id="start-quiz-btn" class="quiz-nav-btn ml-4">Start Quiz</button>
         </div>
 
         <div class="input-grid">
             <div class="input-group">
-                <label>P1 (Pre-pump Pressure)</label>
+                <label for="p1-select">P1 (Pre-pump Pressure)</label>
                 <div class="gauge-container">
                     <svg class="gauge-svg" viewBox="0 0 100 60">
                         <path id="p1-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
@@ -256,9 +433,15 @@
                         <text id="p1-value" class="gauge-value-text" x="50" y="50"></text>
                     </svg>
                 </div>
+                <select id="p1-select" class="param-dropdown" disabled>
+                    <option value="normal">Normal</option>
+                    <option value="increased">Increased</option>
+                    <option value="decreased">Decreased</option>
+                    <option value="severely_decreased">Severely Decreased</option>
+                </select>
             </div>
             <div class="input-group">
-                <label>P2 (Post-pump Pressure)</label>
+                <label for="p2-select">P2 (Post-pump Pressure)</label>
                 <div class="gauge-container">
                     <svg class="gauge-svg" viewBox="0 0 100 60">
                         <path id="p2-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
@@ -267,9 +450,14 @@
                         <text id="p2-value" class="gauge-value-text" x="50" y="50"></text>
                     </svg>
                 </div>
+                <select id="p2-select" class="param-dropdown" disabled>
+                    <option value="normal">Normal</option>
+                    <option value="increased">Increased</option>
+                    <option value="decreased">Decreased</option>
+                </select>
             </div>
             <div class="input-group">
-                <label>P3 (Post-oxygenator Pressure)</label>
+                <label for="p3-select">P3 (Post-oxygenator Pressure)</label>
                 <div class="gauge-container">
                     <svg class="gauge-svg" viewBox="0 0 100 60">
                         <path id="p3-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
@@ -278,9 +466,14 @@
                         <text id="p3-value" class="gauge-value-text" x="50" y="50"></text>
                     </svg>
                 </div>
+                <select id="p3-select" class="param-dropdown" disabled>
+                    <option value="normal">Normal</option>
+                    <option value="increased">Increased</option>
+                    <option value="decreased">Decreased</option>
+                </select>
             </div>
             <div class="input-group">
-                <label>Delta Pressure (P2-P3)</label>
+                <label for="deltaP-select">Delta Pressure (P2-P3)</label>
                 <div class="gauge-container">
                     <svg class="gauge-svg" viewBox="0 0 100 60">
                         <path id="deltaP-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
@@ -289,9 +482,14 @@
                         <text id="deltaP-value" class="gauge-value-text" x="50" y="50"></text>
                     </svg>
                 </div>
+                <select id="deltaP-select" class="param-dropdown" disabled>
+                    <option value="normal">Normal</option>
+                    <option value="increased">Increased</option>
+                    <option value="decreased">Decreased</option>
+                </select>
             </div>
             <div class="input-group">
-                <label>Flow</label>
+                <label for="flow-select">Flow</label>
                 <div class="gauge-container">
                     <svg class="gauge-svg" viewBox="0 0 100 60">
                         <path id="flow-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
@@ -300,9 +498,15 @@
                         <text id="flow-value" class="gauge-value-text" x="50" y="50"></text>
                     </svg>
                 </div>
+                <select id="flow-select" class="param-dropdown" disabled>
+                    <option value="normal">Normal</option>
+                    <option value="decreased">Decreased</option>
+                    <option value="severely_decreased">Severely Decreased</option>
+                    <option value="zero">Zero</option>
+                </select>
             </div>
             <div class="input-group">
-                <label>RPM</label>
+                <label for="rpm-select">RPM</label>
                 <div class="gauge-container">
                     <svg class="gauge-svg" viewBox="0 0 100 60">
                         <path id="rpm-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
@@ -311,27 +515,146 @@
                         <text id="rpm-value" class="gauge-value-text" x="50" y="50"></text>
                     </svg>
                 </div>
+                <select id="rpm-select" class="param-dropdown" disabled>
+                    <option value="normal">Normal</option>
+                    <option value="increased">Increased</option>
+                    <option value="decreased">Decreased</option>
+                    <option value="zero">Zero</option>
+                </select>
             </div>
         </div>
 
         <div id="results" class="mt-8">
             <p>Select a scenario from the dropdown above to see its characteristic trends and potential complications.</p>
         </div>
+
+        <p class="developer-info">Developed by: Dr. Raghavendra Deshpande, Consultant Manipal Hospitals Sarjapur Road, Bengaluru</p>
+    </div>
+
+    <!-- Quiz Section -->
+    <div class="container" id="quiz-section" style="display: none;">
+        <h1 class="text-center">ECMO Quiz</h1>
+        <p class="intro-text text-center">
+            Test your knowledge of ECMO complications! Read the clinical vignette and observe the parameter trends to select the most likely complication.
+        </p>
+        <p class="disclaimer text-center">
+            (Each question is worth 5 marks. Total 50 marks.)
+        </p>
+
+        <div id="quiz-question-area">
+            <h3 id="question-counter">Question 1 of 10</h3>
+            <p id="quiz-vignette"></p>
+            <div class="input-grid mb-4">
+                <div class="input-group">
+                    <label>P1 (Pre-pump Pressure)</label>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 100 60">
+                            <path id="quiz-p1-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
+                            <path id="quiz-p1-fill" class="gauge-fill" d="M10 50 A 40 40 0 0 1 90 50" />
+                            <polygon id="quiz-p1-needle" class="gauge-needle" points="48,50 52,50 50,15" />
+                            <text id="quiz-p1-value" class="gauge-value-text" x="50" y="50"></text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>P2 (Post-pump Pressure)</label>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 100 60">
+                            <path id="quiz-p2-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
+                            <path id="quiz-p2-fill" class="gauge-fill" d="M10 50 A 40 40 0 0 1 90 50" />
+                            <polygon id="quiz-p2-needle" class="gauge-needle" points="48,50 52,50 50,15" />
+                            <text id="quiz-p2-value" class="gauge-value-text" x="50" y="50"></text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>P3 (Post-oxygenator Pressure)</label>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 100 60">
+                            <path id="quiz-p3-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
+                            <path id="quiz-p3-fill" class="gauge-fill" d="M10 50 A 40 40 0 0 1 90 50" />
+                            <polygon id="quiz-p3-needle" class="gauge-needle" points="48,50 52,50 50,15" />
+                            <text id="quiz-p3-value" class="gauge-value-text" x="50" y="50"></text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Delta Pressure (P2-P3)</label>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 100 60">
+                            <path id="quiz-deltaP-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
+                            <path id="quiz-deltaP-fill" class="gauge-fill" d="M10 50 A 40 40 0 0 1 90 50" />
+                            <polygon id="quiz-deltaP-needle" class="gauge-needle" points="48,50 52,50 50,15" />
+                            <text id="quiz-deltaP-value" class="gauge-value-text" x="50" y="50"></text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Flow</label>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 100 60">
+                            <path id="quiz-flow-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
+                            <path id="quiz-flow-fill" class="gauge-fill" d="M10 50 A 40 40 0 0 1 90 50" />
+                            <polygon id="quiz-flow-needle" class="gauge-needle" points="48,50 52,50 50,15" />
+                            <text id="quiz-flow-value" class="gauge-value-text" x="50" y="50"></text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>RPM</label>
+                    <div class="gauge-container">
+                        <svg class="gauge-svg" viewBox="0 0 100 60">
+                            <path id="quiz-rpm-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
+                            <path id="quiz-rpm-fill" class="gauge-fill" d="M10 50 A 40 40 0 0 1 90 50" />
+                            <polygon id="quiz-rpm-needle" class="gauge-needle" points="48,50 52,50 50,15" />
+                            <text id="quiz-rpm-value" class="gauge-value-text" x="50" y="50"></text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div id="quiz-options">
+                <!-- Options will be dynamically loaded here -->
+            </div>
+            <div id="quiz-feedback" class="mt-4"></div>
+        </div>
+
+        <div id="quiz-navigation" class="flex justify-between items-center">
+            <button id="quiz-prev-btn" class="quiz-nav-btn" disabled>Previous</button>
+            <div id="quiz-score">Score: 0 / 50</div>
+            <button id="quiz-next-btn" class="quiz-nav-btn">Next</button>
+        </div>
+        <button id="back-to-simulator-btn">Back to Simulator</button>
+        <p class="developer-info">Developed by: Dr. Raghavendra Deshpande, Consultant Manipal Hospitals Sarjapur Road, Bengaluru</p>
     </div>
 
     <script>
-        // Get references to DOM elements
+        // --- Common Elements & Functions (Simulator & Quiz) ---
+        const mainSimulatorSection = document.getElementById('main-simulator-section');
+        const quizSection = document.getElementById('quiz-section');
+        const startQuizBtn = document.getElementById('start-quiz-btn');
+        const backToSimulatorBtn = document.getElementById('back-to-simulator-btn');
+
         const scenarioSelect = document.getElementById('scenarioSelect');
         const resultsDiv = document.getElementById('results');
 
-        // References to gauge elements
+        // References to gauge elements AND their corresponding select dropdowns (for custom mode)
         const gauges = {
-            p1: { needle: document.getElementById('p1-needle'), fill: document.getElementById('p1-fill'), valueText: document.getElementById('p1-value') },
-            p2: { needle: document.getElementById('p2-needle'), fill: document.getElementById('p2-fill'), valueText: document.getElementById('p2-value') },
-            p3: { needle: document.getElementById('p3-needle'), fill: document.getElementById('p3-fill'), valueText: document.getElementById('p3-value') },
-            deltaP: { needle: document.getElementById('deltaP-needle'), fill: document.getElementById('deltaP-fill'), valueText: document.getElementById('deltaP-value') },
-            flow: { needle: document.getElementById('flow-needle'), fill: document.getElementById('flow-fill'), valueText: document.getElementById('flow-value') },
-            rpm: { needle: document.getElementById('rpm-needle'), fill: document.getElementById('rpm-fill'), valueText: document.getElementById('rpm-value') },
+            p1: { needle: document.getElementById('p1-needle'), fill: document.getElementById('p1-fill'), valueText: document.getElementById('p1-value'), select: document.getElementById('p1-select') },
+            p2: { needle: document.getElementById('p2-needle'), fill: document.getElementById('p2-fill'), valueText: document.getElementById('p2-value'), select: document.getElementById('p2-select') },
+            p3: { needle: document.getElementById('p3-needle'), fill: document.getElementById('p3-fill'), valueText: document.getElementById('p3-value'), select: document.getElementById('p3-select') },
+            deltaP: { needle: document.getElementById('deltaP-needle'), fill: document.getElementById('deltaP-fill'), valueText: document.getElementById('deltaP-value'), select: document.getElementById('deltaP-select') },
+            flow: { needle: document.getElementById('flow-needle'), fill: document.getElementById('flow-fill'), valueText: document.getElementById('flow-value'), select: document.getElementById('flow-select') },
+            rpm: { needle: document.getElementById('rpm-needle'), fill: document.getElementById('rpm-fill'), valueText: document.getElementById('rpm-value'), select: document.getElementById('rpm-select') },
+        };
+
+        // References to quiz gauge elements
+        const quizGauges = {
+            p1: { needle: document.getElementById('quiz-p1-needle'), fill: document.getElementById('quiz-p1-fill'), valueText: document.getElementById('quiz-p1-value') },
+            p2: { needle: document.getElementById('quiz-p2-needle'), fill: document.getElementById('quiz-p2-fill'), valueText: document.getElementById('quiz-p2-value') },
+            p3: { needle: document.getElementById('quiz-p3-needle'), fill: document.getElementById('quiz-p3-fill'), valueText: document.getElementById('quiz-p3-value') },
+            deltaP: { needle: document.getElementById('quiz-deltaP-needle'), fill: document.getElementById('quiz-deltaP-fill'), valueText: document.getElementById('quiz-deltaP-value') },
+            flow: { needle: document.getElementById('quiz-flow-needle'), fill: document.getElementById('quiz-flow-fill'), valueText: document.getElementById('quiz-flow-value') },
+            rpm: { needle: document.getElementById('quiz-rpm-needle'), fill: document.getElementById('quiz-rpm-fill'), valueText: document.getElementById('quiz-rpm-value') },
         };
 
         // Define predefined scenarios with full and short descriptions, qualitative parameters, AND diagnostic algorithms
@@ -342,7 +665,7 @@
                 fullDescription: "This mode allows you to freely adjust the qualitative trends for P1, P2, P3, Delta P, Flow, and RPM. It's ideal for testing specific hypothetical scenarios or for understanding the individual impact of each parameter change. Remember that some combinations may represent highly critical or impossible circuit states.",
                 graphic: "📊",
                 params: { p1: 'normal', p2: 'normal', p3: 'normal', deltaP: 'normal', flow: 'normal', rpm: 'normal' },
-                algorithm: null // No specific algorithm for custom input
+                algorithm: null
             },
             "normal_operation": {
                 name: "Normal Operation (Baseline)",
@@ -350,7 +673,7 @@
                 fullDescription: "In a normal ECMO operation, the pump efficiently draws blood (normal P1), pushes it through the oxygenator (normal P2 and P3, normal Delta P), and returns it to the patient at the desired flow rate with stable RPM. This indicates optimal physiological support and circuit integrity.",
                 graphic: "✅",
                 params: { p1: 'normal', p2: 'normal', p3: 'normal', deltaP: 'normal', flow: 'normal', rpm: 'normal' },
-                algorithm: null // No specific algorithm for normal operation
+                algorithm: null
             },
             "membrane_clot": {
                 name: "Membrane Lung Clot / Oxygenator Failure",
@@ -362,30 +685,30 @@
                     <div class="flowchart-section">
                         <h4>Diagnostic Algorithm (Flowchart)</h4>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">1. Is Delta Pressure (P2-P3) Increased?</span>
+                            <span class="flowchart-question">1. Is Delta Pressure (P2-P3) HIGH?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                                <span class="flowchart-result">Yes</span> → Go to step 2.
                             </div>
                             <div class="flowchart-answer">
-                                No → Consider other complications.
-                            </div>
-                        </div>
-                        <div class="flowchart-step">
-                            <span class="flowchart-question">2. Is Flow Decreased?</span>
-                            <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 3.
-                            </div>
-                            <div class="flowchart-answer">
-                                No → Re-evaluate parameters.
+                                No → This might not be an oxygenator clot.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">3. Is RPM Normal?</span>
+                            <span class="flowchart-question">2. Is Flow LOW?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → <strong>Likely: Oxygenator Clotting/Failure.</strong>
+                                <span class="flowchart-result">Yes</span> → Go to step 3.
                             </div>
                             <div class="flowchart-answer">
-                                No → Consider pump issues or other factors.
+                                No → Recheck all readings.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Is RPM NORMAL?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>This likely means: Oxygenator Clotting/Failure.</strong>
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other pump issues.
                             </div>
                         </div>
                     </div>
@@ -401,30 +724,30 @@
                     <div class="flowchart-section">
                         <h4>Diagnostic Algorithm (Flowchart)</h4>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">1. Is P1 Severely Decreased?</span>
+                            <span class="flowchart-question">1. Is P1 VERY LOW?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                                <span class="flowchart-result">Yes</span> → Go to step 2.
                             </div>
                             <div class="flowchart-answer">
-                                No → Consider other complications.
-                            </div>
-                        </div>
-                        <div class="flowchart-step">
-                            <span class="flowchart-question">2. Is Flow Decreased?</span>
-                            <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 3.
-                            </div>
-                            <div class="flowchart-answer">
-                                No → Re-evaluate parameters.
+                                No → This might not be hypovolemia.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">3. Is RPM Normal?</span>
+                            <span class="flowchart-question">2. Is Flow LOW?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → <strong>Likely: Hypovolemia / Access Insufficiency.</strong>
+                                <span class="flowchart-result">Yes</span> → Go to step 3.
                             </div>
                             <div class="flowchart-answer">
-                                No → Consider pump issues or other factors.
+                                No → Recheck all readings.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Is RPM NORMAL?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>This likely means: Hypovolemia / Access Insufficiency.</strong>
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other pump issues.
                             </div>
                         </div>
                     </div>
@@ -440,30 +763,30 @@
                     <div class="flowchart-section">
                         <h4>Diagnostic Algorithm (Flowchart)</h4>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">1. Is P1 Severely Decreased?</span>
+                            <span class="flowchart-question">1. Is P1 VERY LOW?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                                <span class="flowchart-result">Yes</span> → Go to step 2.
                             </div>
                             <div class="flowchart-answer">
-                                No → Consider other complications.
-                            </div>
-                        </div>
-                        <div class="flowchart-step">
-                            <span class="flowchart-question">2. Is Flow Decreased?</span>
-                            <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 3.
-                            </div>
-                            <div class="flowchart-answer">
-                                No → Re-evaluate parameters.
+                                No → This might not be a kink.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">3. Is RPM Normal?</span>
+                            <span class="flowchart-question">2. Is Flow LOW?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → <strong>Likely: Access Cannula Kink.</strong> (Visually inspect cannula)
+                                <span class="flowchart-result">Yes</span> → Go to step 3.
                             </div>
                             <div class="flowchart-answer">
-                                No → Consider pump issues or other factors.
+                                No → Recheck all readings.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Is RPM NORMAL?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>This likely means: Access Cannula Kink.</strong> (Visually check the cannula for bends)
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other pump issues.
                             </div>
                         </div>
                     </div>
@@ -479,30 +802,30 @@
                     <div class="flowchart-section">
                         <h4>Diagnostic Algorithm (Flowchart)</h4>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">1. Is P3 Increased?</span>
+                            <span class="flowchart-question">1. Is P3 HIGH?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                                <span class="flowchart-result">Yes</span> → Go to step 2.
                             </div>
                             <div class="flowchart-answer">
                                 No → Consider other complications.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">2. Is P2 Increased AND Delta P Normal?</span>
+                            <span class="flowchart-question">2. Is P2 HIGH AND Delta P NORMAL?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                                <span class="flowchart-result">Yes</span> → Go to step 3.
                             </div>
                             <div class="flowchart-answer">
-                                No → Consider oxygenator issues if Delta P is high.
+                                No → Recheck readings. (If Delta P is HIGH, consider oxygenator issues)
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">3. Is Flow Decreased AND RPM Normal?</span>
+                            <span class="flowchart-question">3. Is Flow LOW AND RPM NORMAL?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → <strong>Likely: Return Cannula Kink / Distal Obstruction.</strong> (Visually inspect cannula, assess patient)
+                                <span class="flowchart-result">Yes</span> → <strong>This likely means: Return Cannula Kink / Distal Obstruction.</strong> (Visually check cannula, assess patient)
                             </div>
                             <div class="flowchart-answer">
-                                No → Re-evaluate.
+                                No → Recheck readings.
                             </div>
                         </div>
                     </div>
@@ -518,30 +841,30 @@
                     <div class="flowchart-section">
                         <h4>Diagnostic Algorithm (Flowchart)</h4>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">1. Is P1 Severely Decreased (and potentially fluctuating)?</span>
+                            <span class="flowchart-question">1. Is P1 VERY LOW (and possibly fluctuating)?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                                <span class="flowchart-result">Yes</span> → Go to step 2.
                             </div>
                             <div class="flowchart-answer">
-                                No → Consider other complications.
-                            </div>
-                        </div>
-                        <div class="flowchart-step">
-                            <span class="flowchart-question">2. Is Flow Critically Low?</span>
-                            <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 3.
-                            </div>
-                            <div class="flowchart-answer">
-                                No → Re-evaluate.
+                                No → This might not be air in the circuit.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">3. Is RPM Normal?</span>
+                            <span class="flowchart-question">2. Is Flow CRITICALLY LOW?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → <strong>Likely: Air in Access Circuit.</strong> (Visually inspect circuit for air)
+                                <span class="flowchart-result">Yes</span> → Go to step 3.
                             </div>
                             <div class="flowchart-answer">
-                                No → Consider pump issues or other factors.
+                                No → Recheck all readings.
+                            </div>
+                        </div>
+                        <div class="flowchart-step">
+                            <span class="flowchart-question">3. Is RPM NORMAL?</span>
+                            <div class="flowchart-answer">
+                                <span class="flowchart-result">Yes</span> → <strong>This likely means: Air in Access Circuit.</strong> (Visually inspect circuit for air bubbles)
+                            </div>
+                            <div class="flowchart-answer">
+                                No → Consider other pump issues.
                             </div>
                         </div>
                     </div>
@@ -557,27 +880,27 @@
                     <div class="flowchart-section">
                         <h4>Diagnostic Algorithm (Flowchart)</h4>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">1. Is Flow Decreased?</span>
+                            <span class="flowchart-question">1. Is Flow LOW?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                                <span class="flowchart-result">Yes</span> → Go to step 2.
                             </div>
                             <div class="flowchart-answer">
                                 No → Consider other complications.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">2. Is RPM Normal?</span>
+                            <span class="flowchart-question">2. Is RPM NORMAL?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                                <span class="flowchart-result">Yes</span> → Go to step 3.
                             </div>
                             <div class="flowchart-answer">
-                                No → Re-evaluate parameters.
+                                No → Recheck readings.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">3. Are P2 and P3 Decreased AND Delta P Normal?</span>
+                            <span class="flowchart-question">3. Are P2 and P3 LOW AND Delta P NORMAL?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → <strong>Likely: Impending Pump Failure.</strong> (Prepare for pump change)
+                                <span class="flowchart-result">Yes</span> → <strong>This likely means: Impending Pump Failure.</strong> (Prepare for pump change)
                             </div>
                             <div class="flowchart-answer">
                                 No → Consider circuit rupture or other issues.
@@ -596,30 +919,30 @@
                     <div class="flowchart-section">
                         <h4>Diagnostic Algorithm (Flowchart)</h4>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">1. Is Flow Zero?</span>
+                            <span class="flowchart-question">1. Is Flow ZERO?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                                <span class="flowchart-result">Yes</span> → Go to step 2.
                             </div>
                             <div class="flowchart-answer">
                                 No → Consider other complications.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">2. Is RPM Normal?</span>
+                            <span class="flowchart-question">2. Is RPM NORMAL?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                                <span class="flowchart-result">Yes</span> → Go to step 3.
                             </div>
                             <div class="flowchart-answer">
                                 No → Consider power failure if RPM is zero.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">3. Are P2 and P3 Decreased?</span>
+                            <span class="flowchart-question">3. Are P2 and P3 LOW?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → <strong>Likely: Circuit Rupture / Disconnection.</strong> (IMMEDIATE CLAMPING & INTERVENTION)
+                                <span class="flowchart-result">Yes</span> → <strong>This likely means: Circuit Rupture / Disconnection.</strong> (IMMEDIATE CLAMPING & INTERVENTION)
                             </div>
                             <div class="flowchart-answer">
-                                No → Re-evaluate.
+                                No → Recheck readings.
                             </div>
                         </div>
                     </div>
@@ -635,27 +958,27 @@
                     <div class="flowchart-section">
                         <h4>Diagnostic Algorithm (Flowchart)</h4>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">1. Is P1 Severely Decreased?</span>
+                            <span class="flowchart-question">1. Is P1 VERY LOW?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                                <span class="flowchart-result">Yes</span> → Go to step 2.
                             </div>
                             <div class="flowchart-answer">
                                 No → Consider other complications.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">2. Is Flow Decreased?</span>
+                            <span class="flowchart-question">2. Is Flow LOW?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                                <span class="flowchart-result">Yes</span> → Go to step 3.
                             </div>
                             <div class="flowchart-answer">
-                                No → Re-evaluate.
+                                No → Recheck all readings.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">3. Are P2, P3, and Delta P Normal?</span>
+                            <span class="flowchart-question">3. Are P2, P3, and Delta P NORMAL?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → <strong>Likely: Clot in Access Cannula.</strong> (Visually inspect cannula, assess patient volume)
+                                <span class="flowchart-result">Yes</span> → <strong>This likely means: Clot in Access Cannula.</strong> (Visually check cannula, assess patient volume)
                             </div>
                             <div class="flowchart-answer">
                                 No → Consider hypovolemia or other access issues.
@@ -674,30 +997,30 @@
                     <div class="flowchart-section">
                         <h4>Diagnostic Algorithm (Flowchart)</h4>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">1. Is P3 Increased?</span>
+                            <span class="flowchart-question">1. Is P3 HIGH?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                                <span class="flowchart-result">Yes</span> → Go to step 2.
                             </div>
                             <div class="flowchart-answer">
                                 No → Consider other complications.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">2. Is P2 Increased AND Delta P Normal?</span>
+                            <span class="flowchart-question">2. Is P2 HIGH AND Delta P NORMAL?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                                <span class="flowchart-result">Yes</span> → Go to step 3.
                             </div>
                             <div class="flowchart-answer">
-                                No → Consider oxygenator issues if Delta P is high.
+                                No → Recheck readings. (If Delta P is HIGH, consider oxygenator issues)
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">3. Is Flow Decreased AND RPM Normal?</span>
+                            <span class="flowchart-question">3. Is Flow LOW AND RPM NORMAL?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → <strong>Likely: Clot in Return Cannula.</strong> (Visually inspect cannula, assess patient)
+                                <span class="flowchart-result">Yes</span> → <strong>This likely means: Clot in Return Cannula.</strong> (Visually check cannula, assess patient)
                             </div>
                             <div class="flowchart-answer">
-                                No → Re-evaluate.
+                                No → Recheck readings.
                             </div>
                         </div>
                     </div>
@@ -713,27 +1036,27 @@
                     <div class="flowchart-section">
                         <h4>Diagnostic Algorithm (Flowchart)</h4>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">1. Is RPM Zero?</span>
+                            <span class="flowchart-question">1. Is RPM ZERO?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 2.
+                                <span class="flowchart-result">Yes</span> → Go to step 2.
                             </div>
                             <div class="flowchart-answer">
                                 No → Consider other complications.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">2. Is Flow Zero?</span>
+                            <span class="flowchart-question">2. Is Flow ZERO?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → Proceed to 3.
+                                <span class="flowchart-result">Yes</span> → Go to step 3.
                             </div>
                             <div class="flowchart-answer">
-                                No → Re-evaluate.
+                                No → Recheck all readings.
                             </div>
                         </div>
                         <div class="flowchart-step">
-                            <span class="flowchart-question">3. Are P2 and P3 Decreased, AND P1 Increased?</span>
+                            <span class="flowchart-question">3. Are P2 and P3 LOW, AND P1 HIGH?</span>
                             <div class="flowchart-answer">
-                                <span class="flowchart-result">Yes</span> → <strong>Likely: Power Failure.</strong> (Check power source, hand crank if needed)
+                                <span class="flowchart-result">Yes</span> → <strong>This likely means: Power Failure.</strong> (Check power source, hand crank if needed)
                             </div>
                             <div class="flowchart-answer">
                                 No → Consider pump malfunction or other causes of pump stop.
@@ -743,6 +1066,144 @@
                 `
             }
         };
+
+        // --- Quiz Specific Variables & Functions ---
+        const quizQuestionArea = document.getElementById('quiz-question-area');
+        const questionCounter = document.getElementById('question-counter');
+        const quizVignette = document.getElementById('quiz-vignette');
+        const quizOptionsDiv = document.getElementById('quiz-options');
+        const quizFeedbackDiv = document.getElementById('quiz-feedback');
+        const quizScoreDisplay = document.getElementById('quiz-score');
+        const quizPrevBtn = document.getElementById('quiz-prev-btn');
+        const quizNextBtn = document.getElementById('quiz-next-btn');
+
+        let currentQuizQuestionIndex = 0;
+        let quizScore = 0;
+        let userQuizAnswers = []; // To store selected answer index per question
+
+        // Define quiz questions (10 scenarios, 5 marks each)
+        const quizQuestions = [
+            {
+                vignette: "A 45-year-old patient on VV ECMO suddenly develops a **high P2** alarm and a **low P3** alarm. The circuit flow has significantly **decreased**, but the **RPM remains normal**. There are no visible kinks in the cannulas.",
+                params: { p1: 'normal', p2: 'increased', p3: 'decreased', deltaP: 'increased', flow: 'decreased', rpm: 'normal' },
+                options: [
+                    "Hypovolemia",
+                    "Membrane Lung Clot / Oxygenator Failure",
+                    "Return Cannula Kink",
+                    "Power Failure"
+                ],
+                correctAnswerIndex: 1, // Index of "Membrane Lung Clot / Oxygenator Failure"
+                explanation: "This pattern (increased P2, decreased P3, high Delta P, decreased flow at normal RPM) is characteristic of increased resistance across the oxygenator, most commonly due to a clot or oxygenator failure."
+            },
+            {
+                vignette: "A 60-year-old patient on VA ECMO suddenly shows a **severely decreased P1** with frequent 'chattering' of the access line. The **flow has dropped** significantly, but the **RPM is unchanged**. The patient appears pale with poor peripheral perfusion.",
+                params: { p1: 'severely_decreased', p2: 'normal', p3: 'normal', deltaP: 'normal', flow: 'decreased', rpm: 'normal' },
+                options: [
+                    "Access Cannula Kink",
+                    "Membrane Lung Clot",
+                    "Impending Pump Failure",
+                    "Circuit Rupture"
+                ],
+                correctAnswerIndex: 0, // Index of "Access Cannula Kink" (or Hypovolemia)
+                explanation: "A severely decreased P1 with chattering and decreased flow at normal RPM strongly suggests an issue with venous return to the pump. This could be due to hypovolemia or an access cannula kink. Given no other changes, a kink is a strong possibility."
+            },
+            {
+                vignette: "During a routine ECMO round, you notice the **RPM is zero** and the **flow is also zero**. P2 and P3 are both **decreased**, and P1 is **increased**. The bedside monitor shows the ECMO machine is off.",
+                params: { p1: 'increased', p2: 'decreased', p3: 'decreased', deltaP: 'decreased', flow: 'zero', rpm: 'zero' },
+                options: [
+                    "Air in Circuit",
+                    "Circuit Rupture",
+                    "Power Failure",
+                    "Return Cannula Clot"
+                ],
+                correctAnswerIndex: 2, // Index of "Power Failure"
+                explanation: "Zero RPM and zero flow, coupled with decreased P2/P3 and an increased P1, are classic signs of a power failure or deliberate shutdown of the ECMO pump. The increased P1 occurs because the pump is no longer pulling blood from the patient."
+            },
+            {
+                vignette: "A patient on ECMO has stable RPM, but the **flow has gradually decreased** over the last hour. Both **P2 and P3 are slightly decreased**, and the **Delta P remains normal**. There are no visible clots or kinks.",
+                params: { p1: 'normal', p2: 'decreased', p3: 'decreased', deltaP: 'normal', flow: 'decreased', rpm: 'normal' },
+                options: [
+                    "Hypovolemia",
+                    "Membrane Lung Clot",
+                    "Impending Pump Failure",
+                    "Access Cannula Clot"
+                ],
+                correctAnswerIndex: 2, // Index of "Impending Pump Failure"
+                explanation: "A gradual decrease in flow despite normal RPM, with proportionally decreased P2 and P3 (normal Delta P), suggests that the pump itself is becoming less efficient, indicating impending pump failure."
+            },
+            {
+                vignette: "You hear a loud alarm and see the ECMO circuit is disconnected from the patient's return cannula. The **flow has dropped to zero**, **P2 and P3 are severely decreased**, but the **pump is still running at normal RPM**.",
+                params: { p1: 'normal', p2: 'decreased', p3: 'decreased', deltaP: 'normal', flow: 'zero', rpm: 'normal' },
+                options: [
+                    "Power Failure",
+                    "Air in Circuit",
+                    "Circuit Rupture / Disconnection",
+                    "Oxygenator Clot"
+                ],
+                correctAnswerIndex: 2, // Index of "Circuit Rupture / Disconnection"
+                explanation: "Zero flow with a running pump (normal RPM) and drastically decreased P2/P3 points to a loss of circuit integrity, such as a rupture or disconnection, where the blood volume is no longer contained within the circuit."
+            },
+            {
+                vignette: "The patient's venous access site appears swollen. The ECMO monitor shows a **severely decreased P1** and a **decreased flow**. P2, P3, and Delta P remain normal, and the RPM is unchanged.",
+                params: { p1: 'severely_decreased', p2: 'normal', p3: 'normal', deltaP: 'normal', flow: 'decreased', rpm: 'normal' },
+                options: [
+                    "Return Cannula Clot",
+                    "Access Cannula Clot",
+                    "Impending Pump Failure",
+                    "Air in Circuit"
+                ],
+                correctAnswerIndex: 1, // Index of "Access Cannula Clot"
+                explanation: "A severely decreased P1 and decreased flow, with otherwise normal circuit pressures, are classic signs of an obstruction in the access cannula, often due to a clot or malposition."
+            },
+            {
+                vignette: "A patient on ECMO is agitated. You notice the **return cannula is bent** at an acute angle. The monitor shows **P3 is increased**, **P2 is also increased**, and **Delta P is normal**. Flow is decreased, but RPM is normal.",
+                params: { p1: 'normal', p2: 'increased', p3: 'increased', deltaP: 'normal', flow: 'decreased', rpm: 'normal' },
+                options: [
+                    "Membrane Lung Clot",
+                    "Access Cannula Kink",
+                    "Return Cannula Kink / Distal Obstruction",
+                    "Hypovolemia"
+                ],
+                correctAnswerIndex: 2, // Index of "Return Cannula Kink / Distal Obstruction"
+                explanation: "An increased P3 (and proportionally increased P2, keeping Delta P normal) with decreased flow at normal RPM is highly indicative of an obstruction in the return limb, such as a kinked cannula or severe patient vasoconstriction."
+            },
+            {
+                vignette: "You observe intermittent 'chattering' in the access line and foam in the reservoir. P1 is **severely decreased** and fluctuating. Flow is **critically low** and erratic, while RPM remains normal. P2 and P3 are both **decreased**.",
+                params: { p1: 'severely_decreased', p2: 'decreased', p3: 'decreased', deltaP: 'normal', flow: 'severely_decreased', rpm: 'normal' },
+                options: [
+                    "Power Failure",
+                    "Air in Access Circuit",
+                    "Circuit Rupture",
+                    "Impending Pump Failure"
+                ],
+                correctAnswerIndex: 1, // Index of "Air in Access Circuit"
+                explanation: "Severely decreased and fluctuating P1, critically low flow, and visible foam/chattering are hallmark signs of air entrainment in the access circuit. This is a critical situation requiring immediate intervention."
+            },
+            {
+                vignette: "A patient on ECMO suddenly becomes hypotensive. The ECMO flow has **decreased**, and P1 is now **decreased** (more negative than before). P2, P3, and Delta P are all normal. RPM is unchanged.",
+                params: { p1: 'decreased', p2: 'normal', p3: 'normal', deltaP: 'normal', flow: 'decreased', rpm: 'normal' },
+                options: [
+                    "Hypovolemia",
+                    "Membrane Lung Clot",
+                    "Return Cannula Clot",
+                    "Power Failure"
+                ],
+                correctAnswerIndex: 0, // Index of "Hypovolemia"
+                explanation: "A decreased P1 and decreased flow at normal RPM, with otherwise normal circuit pressures, strongly suggests that the patient is hypovolemic and the pump is struggling to draw enough blood."
+            },
+            {
+                vignette: "The ECMO circuit has been running smoothly, but suddenly you notice a **large clot** visible in the oxygenator membrane. The monitor shows **P2 is increased**, **P3 is decreased**, and the **Delta P is significantly increased**. Flow is **decreased** despite normal RPM.",
+                params: { p1: 'normal', p2: 'increased', p3: 'decreased', deltaP: 'increased', flow: 'decreased', rpm: 'normal' },
+                options: [
+                    "Access Cannula Kink",
+                    "Return Cannula Kink",
+                    "Membrane Lung Clot / Oxygenator Failure",
+                    "Impending Pump Failure"
+                ],
+                correctAnswerIndex: 2, // Index of "Membrane Lung Clot / Oxygenator Failure"
+                explanation: "The presence of a visible clot in the oxygenator, combined with increased P2, decreased P3, a high Delta P, and decreased flow at normal RPM, unequivocally points to a membrane lung clot or oxygenator failure."
+            }
+        ];
 
         /**
          * Updates a single gauge's needle position, fill color, and text value.
@@ -930,22 +1391,35 @@
             return resultMessage;
         }
 
-        /**
-         * Handles scenario selection from the dropdown.
-         * Populates input fields and runs simulation.
-         */
+        // --- Simulator Specific Logic ---
         scenarioSelect.addEventListener('change', (event) => {
             const selectedScenarioKey = event.target.value;
             const scenario = scenarios[selectedScenarioKey];
 
-            if (scenario) {
-                // Update gauge visuals based on selected scenario parameters
-                updateGauge(gauges.p1, scenario.params.p1);
-                updateGauge(gauges.p2, scenario.params.p2);
-                updateGauge(gauges.p3, scenario.params.p3);
-                updateGauge(gauges.deltaP, scenario.params.deltaP);
-                updateGauge(gauges.flow, scenario.params.flow);
-                updateGauge(gauges.rpm, scenario.params.rpm);
+            // Get references to the individual parameter select elements
+            const p1Select = gauges.p1.select;
+            const p2Select = gauges.p2.select;
+            const p3Select = gauges.p3.select;
+            const deltaPSelect = gauges.deltaP.select;
+            const flowSelect = gauges.flow.select;
+            const rpmSelect = gauges.rpm.select;
+
+            // Function to update display and analysis based on current dropdown values
+            const updateSimulatorDisplayAndAnalysis = () => {
+                const currentP1Trend = p1Select.value;
+                const currentP2Trend = p2Select.value;
+                const currentP3Trend = p3Select.value;
+                const currentDeltaPTrend = deltaPSelect.value;
+                const currentFlowTrend = flowSelect.value;
+                const currentRpmTrend = rpmSelect.value;
+
+                // Update gauge visuals based on current dropdown values
+                updateGauge(gauges.p1, currentP1Trend);
+                updateGauge(gauges.p2, currentP2Trend);
+                updateGauge(gauges.p3, currentP3Trend);
+                updateGauge(gauges.deltaP, currentDeltaPTrend);
+                updateGauge(gauges.flow, currentFlowTrend);
+                updateGauge(gauges.rpm, currentRpmTrend);
 
                 // Generate and display the scenario information
                 let displayContent = `
@@ -958,17 +1432,17 @@
 
                 // Add the detailed analysis from analyzeECMOScenario
                 displayContent += analyzeECMOScenario(
-                    scenario.params.p1,
-                    scenario.params.p2,
-                    scenario.params.p3,
-                    scenario.params.deltaP,
-                    scenario.params.flow,
-                    scenario.params.rpm
+                    currentP1Trend,
+                    currentP2Trend,
+                    currentP3Trend,
+                    currentDeltaPTrend,
+                    currentFlowTrend,
+                    currentRpmTrend
                 );
 
                 resultsDiv.innerHTML = displayContent;
 
-                // Add event listener for the new Read More button
+                // Re-attach event listener for the new Read More button (as innerHTML replaces it)
                 const readMoreBtn = document.getElementById('readMoreBtn');
                 const shortDesc = document.getElementById('shortDescription');
                 const fullDesc = document.getElementById('fullDescription');
@@ -979,21 +1453,17 @@
                 }
 
                 if (readMoreBtn) {
-                    // Only show read more button if full description (including algorithm) is longer than short
-                    // This comparison is a bit tricky with HTML content, so we'll simplify:
-                    // If there's a fullDescription OR an algorithm, show the button.
                     const hasMoreContent = scenario.fullDescription.length > scenario.shortDescription.length || scenario.algorithm !== null;
 
                     if (hasMoreContent) {
                         readMoreBtn.style.display = 'block';
-                        fullDesc.style.display = 'none'; // Ensure full description is hidden initially
-                        shortDesc.style.display = 'block'; // Ensure short description is visible initially
+                        fullDesc.style.display = 'none';
+                        shortDesc.style.display = 'block';
                     } else {
                         readMoreBtn.style.display = 'none';
-                        fullDesc.style.display = 'block'; // If no short/long difference, show full
+                        fullDesc.style.display = 'block';
                         shortDesc.style.display = 'none';
                     }
-
 
                     readMoreBtn.addEventListener('click', () => {
                         if (fullDesc.style.display === 'none') {
@@ -1007,12 +1477,188 @@
                         }
                     });
                 }
+            }; // End of updateSimulatorDisplayAndAnalysis function
+
+            // Set dropdown values and enable/disable them
+            p1Select.value = scenario.params.p1;
+            p2Select.value = scenario.params.p2;
+            p3Select.value = scenario.params.p3;
+            deltaPSelect.value = scenario.params.deltaP;
+            flowSelect.value = scenario.params.flow;
+            rpmSelect.value = scenario.params.rpm;
+
+            const isCustom = selectedScenarioKey === 'custom';
+            for (const key in gauges) {
+                if (gauges[key].select) { // Ensure the select element exists
+                    gauges[key].select.disabled = !isCustom;
+                    // Remove existing listeners to prevent multiple calls
+                    gauges[key].select.removeEventListener('change', updateSimulatorDisplayAndAnalysis);
+                    if (isCustom) {
+                        // Add listener only if in custom mode
+                        gauges[key].select.addEventListener('change', updateSimulatorDisplayAndAnalysis);
+                    }
+                }
+            }
+
+            // Perform initial update for the selected scenario (or custom defaults)
+            updateSimulatorDisplayAndAnalysis();
+        });
+
+        // --- Quiz Logic ---
+        const quizGaugesMap = {
+            p1: quizGauges.p1, p2: quizGauges.p2, p3: quizGauges.p3,
+            deltaP: quizGauges.deltaP, flow: quizGauges.flow, rpm: quizGauges.rpm
+        };
+
+        function displayQuizQuestion() {
+            const question = quizQuestions[currentQuizQuestionIndex];
+            questionCounter.textContent = `Question ${currentQuizQuestionIndex + 1} of ${quizQuestions.length}`;
+            quizVignette.textContent = question.vignette;
+
+            // Update quiz gauges
+            updateGauge(quizGaugesMap.p1, question.params.p1);
+            updateGauge(quizGaugesMap.p2, question.params.p2);
+            updateGauge(quizGaugesMap.p3, question.params.p3);
+            updateGauge(quizGaugesMap.deltaP, question.params.deltaP);
+            updateGauge(quizGaugesMap.flow, question.params.flow);
+            updateGauge(quizGaugesMap.rpm, question.params.rpm);
+
+            // Clear previous options and feedback
+            quizOptionsDiv.innerHTML = '';
+            quizFeedbackDiv.style.display = 'none';
+            quizFeedbackDiv.className = 'mt-4'; // Reset classes
+
+            // Create options
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'quiz-option-btn';
+                button.onclick = () => selectQuizOption(index);
+                quizOptionsDiv.appendChild(button);
+            });
+
+            // Update navigation buttons
+            quizPrevBtn.disabled = currentQuizQuestionIndex === 0;
+            quizNextBtn.disabled = userQuizAnswers[currentQuizQuestionIndex] === undefined && currentQuizQuestionIndex < quizQuestions.length - 1;
+
+            // Restore user's previous answer if exists
+            if (userQuizAnswers[currentQuizQuestionIndex] !== undefined) {
+                const selectedOptionBtn = quizOptionsDiv.children[userQuizAnswers[currentQuizQuestionIndex].selectedOptionIndex];
+                if (selectedOptionBtn) {
+                    selectedOptionBtn.classList.add('selected');
+                    if (userQuizAnswers[currentQuizQuestionIndex].isCorrect) {
+                        selectedOptionBtn.classList.add('correct');
+                        quizFeedbackDiv.textContent = "Correct! " + question.explanation;
+                        quizFeedbackDiv.classList.add('correct-feedback');
+                    } else {
+                        selectedOptionBtn.classList.add('incorrect');
+                        quizFeedbackDiv.textContent = "Incorrect. " + question.explanation;
+                        quizFeedbackDiv.classList.add('incorrect-feedback');
+                    }
+                    quizFeedbackDiv.style.display = 'block';
+                    disableQuizOptions();
+                }
+            }
+            updateQuizScoreDisplay();
+        }
+
+        function selectQuizOption(selectedIndex) {
+            const question = quizQuestions[currentQuizQuestionIndex];
+            const isCorrect = (selectedIndex === question.correctAnswerIndex);
+            const scoreEarned = isCorrect ? 5 : 0;
+
+            // Store answer
+            userQuizAnswers[currentQuizQuestionIndex] = {
+                selectedOptionIndex: selectedIndex,
+                isCorrect: isCorrect,
+                score: scoreEarned
+            };
+
+            // Update UI
+            Array.from(quizOptionsDiv.children).forEach((button, index) => {
+                button.classList.remove('selected');
+                if (index === selectedIndex) {
+                    button.classList.add('selected');
+                    if (isCorrect) {
+                        button.classList.add('correct');
+                    } else {
+                        button.classList.add('incorrect');
+                    }
+                }
+                // Highlight correct answer if incorrect was chosen
+                if (!isCorrect && index === question.correctAnswerIndex) {
+                    button.classList.add('correct');
+                }
+            });
+
+            quizFeedbackDiv.textContent = (isCorrect ? "Correct! " : "Incorrect. ") + question.explanation;
+            quizFeedbackDiv.className = `mt-4 ${isCorrect ? 'correct-feedback' : 'incorrect-feedback'}`;
+            quizFeedbackDiv.style.display = 'block';
+
+            disableQuizOptions();
+            updateQuizScoreDisplay();
+            quizNextBtn.disabled = false; // Enable next button after answering
+        }
+
+        function disableQuizOptions() {
+            Array.from(quizOptionsDiv.children).forEach(button => {
+                button.disabled = true;
+                button.style.pointerEvents = 'none';
+            });
+        }
+
+        function updateQuizScoreDisplay() {
+            quizScore = userQuizAnswers.reduce((total, answer) => total + (answer ? answer.score : 0), 0);
+            quizScoreDisplay.textContent = `Score: ${quizScore} / 50`;
+
+            if (currentQuizQuestionIndex === quizQuestions.length - 1 && userQuizAnswers[currentQuizQuestionIndex] !== undefined) {
+                // All questions answered, show final score
+                quizNextBtn.textContent = "Finish Quiz";
+            } else {
+                quizNextBtn.textContent = "Next";
+            }
+        }
+
+        quizNextBtn.addEventListener('click', () => {
+            if (currentQuizQuestionIndex < quizQuestions.length - 1) {
+                currentQuizQuestionIndex++;
+                displayQuizQuestion();
+            } else if (currentQuizQuestionIndex === quizQuestions.length - 1 && userQuizAnswers[currentQuizQuestionIndex] !== undefined) {
+                // Quiz finished, show final score summary (optional, could be a modal)
+                alert(`Quiz Finished! Your total score is: ${quizScore} / 50`);
+                // Optionally, reset quiz or show a summary screen
             }
         });
 
-        // Initial simulation on load for default values
+        quizPrevBtn.addEventListener('click', () => {
+            if (currentQuizQuestionIndex > 0) {
+                currentQuizQuestionIndex--;
+                displayQuizQuestion();
+            }
+        });
+
+        startQuizBtn.addEventListener('click', () => {
+            mainSimulatorSection.style.display = 'none';
+            quizSection.style.display = 'flex';
+            currentQuizQuestionIndex = 0;
+            quizScore = 0;
+            userQuizAnswers = []; // Reset answers for new quiz session
+            displayQuizQuestion();
+            updateQuizScoreDisplay();
+        });
+
+        backToSimulatorBtn.addEventListener('click', () => {
+            quizSection.style.display = 'none';
+            mainSimulatorSection.style.display = 'flex';
+            // Reset simulator to normal operation when returning
+            scenarioSelect.value = "normal_operation";
+            scenarioSelect.dispatchEvent(new Event('change'));
+        });
+
+
+        // --- Initial Load ---
         window.onload = function() {
-            // Set default scenario to "Normal Operation" and trigger change event
+            // Set default simulator scenario to "Normal Operation" and trigger change event
             scenarioSelect.value = "normal_operation";
             scenarioSelect.dispatchEvent(new Event('change'));
         };
