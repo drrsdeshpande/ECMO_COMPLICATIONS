@@ -438,50 +438,71 @@
             color: #1976d2;
         }
 
-        /* Style for the actual dropdowns when enabled for custom input */
-        .param-dropdown {
-            padding: 0.6rem 0.8rem; /* Base padding */
-            border: 1px solid #cbd5e0;
-            border-radius: 0.6rem; /* Base rounded corners */
-            font-size: 0.9rem; /* Base font size */
-            color: #2d3748;
-            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            background-color: #ffffff;
+        /* Slider specific styles */
+        input[type="range"] {
+            -webkit-appearance: none; /* Hides the slider so that custom slider can be designed */
+            width: 100%; /* Full-width */
+            height: 8px; /* Specify a height to be visible */
+            background: #d3d3d3; /* Grey background */
+            outline: none; /* Remove outline */
+            opacity: 0.7; /* Set transparency (for hover effect) */
+            -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+            transition: opacity .2s;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="range"]:hover {
+            opacity: 1; /* Fully opaque on hover */
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; /* Override default look */
             appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234a5568%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-6.5%200-12.3%203.2-16.2%208.1-3.9%204.9-4.7%2011.4-2.1%2017.3l139.3%20139.3c3.9%203.9%209.2%206.2%2014.7%206.2s10.8-2.3%2014.7-6.2l139.3-139.3c5.4-5.9%204.6-12.4.7-17.3z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: right 0.6rem center; /* Adjusted position */
-            background-size: 0.7em auto; /* Adjusted size */
-            width: 100%;
+            width: 20px; /* Set a specific slider handle size */
+            height: 20px; /* Slider handle height */
+            border-radius: 50%; /* Round slider handle */
+            background: #4299e1; /* Blue background */
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
         }
-        @media (min-width: 640px) {
-            .param-dropdown {
-                padding: 0.7rem 0.9rem;
-                border-radius: 0.7rem;
-                font-size: 0.95rem;
-                background-position: right 0.7rem center;
-                background-size: 0.75em auto;
-            }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px; /* Set a specific slider handle size */
+            height: 20px; /* Slider handle height */
+            border-radius: 50%; /* Round slider handle */
+            background: #4299e1; /* Blue background */
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
         }
-        @media (min-width: 768px) {
-            .param-dropdown {
-                padding: 0.75rem 1rem;
-                border-radius: 0.75rem;
-                font-size: 1rem;
-                background-position: right 0.75rem center;
-                background-size: 0.8em auto;
-            }
-        }
-        .param-dropdown:focus {
-            outline: none;
-            border-color: #4299e1;
-            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
-        }
-        .param-dropdown:disabled {
-            background-color: #eceff1;
+
+        /* Disabled slider styling */
+        input[type="range"]:disabled {
+            background: #eceff1;
             cursor: not-allowed;
-            opacity: 0.8;
+            opacity: 0.5;
         }
+
+        input[type="range"]:disabled::-webkit-slider-thumb {
+            background: #a0aec0;
+            box-shadow: none;
+        }
+
+        input[type="range"]:disabled::-moz-range-thumb {
+            background: #a0aec0;
+            box-shadow: none;
+        }
+
+        .slider-value-display {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #34495e;
+            margin-top: 0.2rem;
+            min-height: 1.2em; /* Prevent layout shift */
+        }
+
 
         /* Quiz specific styles */
         #quiz-section {
@@ -760,6 +781,75 @@
         #back-to-simulator-btn:hover {
             background-color: #455a64;
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-in-out;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        .modal-content h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        .modal-content p {
+            font-size: 1.2rem;
+            color: #55606e;
+            margin-bottom: 1.5rem;
+        }
+        .modal-content button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            border: none;
+            margin: 0 0.5rem;
+        }
+        .modal-content .close-modal-btn {
+            background-color: #dc3545;
+            color: #ffffff;
+        }
+        .modal-content .close-modal-btn:hover {
+            background-color: #c82333;
+        }
+        .modal-content .restart-quiz-modal-btn {
+            background-color: #28a745;
+            color: #ffffff;
+        }
+        .modal-content .restart-quiz-modal-btn:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
@@ -772,9 +862,9 @@
             (All values are illustrative and for educational purposes only. Consult medical professionals for actual patient care.)
         </p>
 
-        <div class="input-group mb-6 flex-row justify-between items-center">
-            <label for="scenarioSelect" class="mb-0">Select a Predefined Scenario:</label>
-            <select id="scenarioSelect" class="param-dropdown w-2/3">
+        <div class="input-group mb-6 flex-col items-center">
+            <label for="scenarioSelect" class="mb-2">Select a Predefined Scenario:</label>
+            <select id="scenarioSelect" class="param-dropdown w-full">
                 <option value="normal_operation">Normal Operation (Baseline)</option>
                 <option value="membrane_clot">Membrane Lung Clot / Oxygenator Failure</option>
                 <option value="hypovolemia">Hypovolemia / Access Insufficiency</option>
@@ -788,12 +878,11 @@
                 <option value="power_failure">Power Failure</option>
                 <option value="custom">Custom Input</option>
             </select>
-            <button id="start-quiz-btn" class="quiz-nav-btn ml-4">Start Quiz</button>
         </div>
 
         <div class="input-grid">
             <div class="input-group">
-                <label for="p1-select">P1 (Pre-pump Pressure)</label>
+                <label>P1 (Pre-pump Pressure)</label>
                 <div class="gauge-container">
                     <svg class="gauge-svg" viewBox="0 0 100 60">
                         <path id="p1-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
@@ -802,15 +891,11 @@
                         <text id="p1-value" class="gauge-value-text" x="50" y="50"></text>
                     </svg>
                 </div>
-                <select id="p1-select" class="param-dropdown" disabled>
-                    <option value="normal">Normal</option>
-                    <option value="increased">Increased</option>
-                    <option value="decreased">Decreased</option>
-                    <option value="severely_decreased">Severely Decreased</option>
-                </select>
+                <input type="range" id="p1-slider" min="1" max="4" step="1" value="3">
+                <span id="p1-slider-value" class="slider-value-display">Normal</span>
             </div>
             <div class="input-group">
-                <label for="p2-select">P2 (Post-pump Pressure)</label>
+                <label>P2 (Post-pump Pressure)</label>
                 <div class="gauge-container">
                     <svg class="gauge-svg" viewBox="0 0 100 60">
                         <path id="p2-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
@@ -819,14 +904,11 @@
                         <text id="p2-value" class="gauge-value-text" x="50" y="50"></text>
                     </svg>
                 </div>
-                <select id="p2-select" class="param-dropdown" disabled>
-                    <option value="normal">Normal</option>
-                    <option value="increased">Increased</option>
-                    <option value="decreased">Decreased</option>
-                </select>
+                <input type="range" id="p2-slider" min="2" max="4" step="1" value="3">
+                <span id="p2-slider-value" class="slider-value-display">Normal</span>
             </div>
             <div class="input-group">
-                <label for="p3-select">P3 (Post-oxygenator Pressure)</label>
+                <label>P3 (Post-oxygenator Pressure)</label>
                 <div class="gauge-container">
                     <svg class="gauge-svg" viewBox="0 0 100 60">
                         <path id="p3-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
@@ -835,14 +917,11 @@
                         <text id="p3-value" class="gauge-value-text" x="50" y="50"></text>
                     </svg>
                 </div>
-                <select id="p3-select" class="param-dropdown" disabled>
-                    <option value="normal">Normal</option>
-                    <option value="increased">Increased</option>
-                    <option value="decreased">Decreased</option>
-                </select>
+                <input type="range" id="p3-slider" min="2" max="4" step="1" value="3">
+                <span id="p3-slider-value" class="slider-value-display">Normal</span>
             </div>
             <div class="input-group">
-                <label for="deltaP-select">Delta Pressure (P2-P3)</label>
+                <label>Delta Pressure (P2-P3)</label>
                 <div class="gauge-container">
                     <svg class="gauge-svg" viewBox="0 0 100 60">
                         <path id="deltaP-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
@@ -851,14 +930,11 @@
                         <text id="deltaP-value" class="gauge-value-text" x="50" y="50"></text>
                     </svg>
                 </div>
-                <select id="deltaP-select" class="param-dropdown" disabled>
-                    <option value="normal">Normal</option>
-                    <option value="increased">Increased</option>
-                    <option value="decreased">Decreased</option>
-                </select>
+                <input type="range" id="deltaP-slider" min="2" max="4" step="1" value="3">
+                <span id="deltaP-slider-value" class="slider-value-display">Normal</span>
             </div>
             <div class="input-group">
-                <label for="flow-select">Flow</label>
+                <label>Flow</label>
                 <div class="gauge-container">
                     <svg class="gauge-svg" viewBox="0 0 100 60">
                         <path id="flow-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
@@ -867,15 +943,11 @@
                         <text id="flow-value" class="gauge-value-text" x="50" y="50"></text>
                     </svg>
                 </div>
-                <select id="flow-select" class="param-dropdown" disabled>
-                    <option value="normal">Normal</option>
-                    <option value="decreased">Decreased</option>
-                    <option value="severely_decreased">Severely Decreased</option>
-                    <option value="zero">Zero</option>
-                </select>
+                <input type="range" id="flow-slider" min="0" max="3" step="1" value="3">
+                <span id="flow-slider-value" class="slider-value-display">Normal</span>
             </div>
             <div class="input-group">
-                <label for="rpm-select">RPM</label>
+                <label>RPM</label>
                 <div class="gauge-container">
                     <svg class="gauge-svg" viewBox="0 0 100 60">
                         <path id="rpm-track" class="gauge-track" d="M10 50 A 40 40 0 0 1 90 50" />
@@ -884,18 +956,17 @@
                         <text id="rpm-value" class="gauge-value-text" x="50" y="50"></text>
                     </svg>
                 </div>
-                <select id="rpm-select" class="param-dropdown" disabled>
-                    <option value="normal">Normal</option>
-                    <option value="increased">Increased</option>
-                    <option value="decreased">Decreased</option>
-                    <option value="zero">Zero</option>
-                </select>
+                <input type="range" id="rpm-slider" min="0" max="3" step="1" value="2"> <!-- RPM has zero, decreased, normal, increased -->
+                <span id="rpm-slider-value" class="slider-value-display">Normal</span>
             </div>
         </div>
 
         <div id="results" class="mt-8">
             <p>Select a scenario from the dropdown above to see its characteristic trends and potential complications.</p>
         </div>
+
+        <!-- Moved Start Quiz button here -->
+        <button id="start-quiz-btn" class="quiz-nav-btn mt-6 self-center">Start Quiz</button>
 
         <p class="developer-info">Developed by: Dr. Raghavendra Deshpande, Consultant Manipal Hospitals Sarjapur Road, Bengaluru</p>
     </div>
@@ -996,6 +1067,16 @@
         <p class="developer-info">Developed by: Dr. Raghavendra Deshpande, Consultant Manipal Hospitals Sarjapur Road, Bengaluru</p>
     </div>
 
+    <!-- Quiz Completion Modal -->
+    <div id="quiz-completion-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Quiz Complete!</h2>
+            <p id="final-score-display">Your total score: <strong>0 / 50</strong></p>
+            <button class="restart-quiz-modal-btn">Restart Quiz</button>
+            <button class="close-modal-btn">Close</button>
+        </div>
+    </div>
+
     <script>
         // --- Common Elements & Functions (Simulator & Quiz) ---
         const mainSimulatorSection = document.getElementById('main-simulator-section');
@@ -1006,17 +1087,71 @@
         const scenarioSelect = document.getElementById('scenarioSelect');
         const resultsDiv = document.getElementById('results');
 
-        // References to gauge elements AND their corresponding select dropdowns (for custom mode)
-        const gauges = {
-            p1: { needle: document.getElementById('p1-needle'), fill: document.getElementById('p1-fill'), valueText: document.getElementById('p1-value'), select: document.getElementById('p1-select') },
-            p2: { needle: document.getElementById('p2-needle'), fill: document.getElementById('p2-fill'), valueText: document.getElementById('p2-value'), select: document.getElementById('p2-select') },
-            p3: { needle: document.getElementById('p3-needle'), fill: document.getElementById('p3-fill'), valueText: document.getElementById('p3-value'), select: document.getElementById('p3-select') },
-            deltaP: { needle: document.getElementById('deltaP-needle'), fill: document.getElementById('deltaP-fill'), valueText: document.getElementById('deltaP-value'), select: document.getElementById('deltaP-select') },
-            flow: { needle: document.getElementById('flow-needle'), fill: document.getElementById('flow-fill'), valueText: document.getElementById('flow-value'), select: document.getElementById('flow-select') },
-            rpm: { needle: document.getElementById('rpm-needle'), fill: document.getElementById('rpm-fill'), valueText: document.getElementById('rpm-value'), select: document.getElementById('rpm-select') },
+        // Maps numerical slider values to qualitative trend strings
+        const valueToTrendMap = {
+            0: 'zero',
+            1: 'severely_decreased',
+            2: 'decreased',
+            3: 'normal',
+            4: 'increased'
         };
 
-        // References to quiz gauge elements
+        // Maps qualitative trend strings to numerical slider values
+        const trendToValueMap = {
+            'zero': 0,
+            'severely_decreased': 1,
+            'decreased': 2,
+            'normal': 3,
+            'increased': 4
+        };
+
+        // References to gauge elements AND their corresponding slider elements (for custom mode)
+        const gauges = {
+            p1: {
+                needle: document.getElementById('p1-needle'),
+                fill: document.getElementById('p1-fill'),
+                valueText: document.getElementById('p1-value'),
+                slider: document.getElementById('p1-slider'),
+                sliderValueDisplay: document.getElementById('p1-slider-value')
+            },
+            p2: {
+                needle: document.getElementById('p2-needle'),
+                fill: document.getElementById('p2-fill'),
+                valueText: document.getElementById('p2-value'),
+                slider: document.getElementById('p2-slider'),
+                sliderValueDisplay: document.getElementById('p2-slider-value')
+            },
+            p3: {
+                needle: document.getElementById('p3-needle'),
+                fill: document.getElementById('p3-fill'),
+                valueText: document.getElementById('p3-value'),
+                slider: document.getElementById('p3-slider'),
+                sliderValueDisplay: document.getElementById('p3-slider-value')
+            },
+            deltaP: {
+                needle: document.getElementById('deltaP-needle'),
+                fill: document.getElementById('deltaP-fill'),
+                valueText: document.getElementById('deltaP-value'),
+                slider: document.getElementById('deltaP-slider'),
+                sliderValueDisplay: document.getElementById('deltaP-slider-value')
+            },
+            flow: {
+                needle: document.getElementById('flow-needle'),
+                fill: document.getElementById('flow-fill'),
+                valueText: document.getElementById('flow-value'),
+                slider: document.getElementById('flow-slider'),
+                sliderValueDisplay: document.getElementById('flow-slider-value')
+            },
+            rpm: {
+                needle: document.getElementById('rpm-needle'),
+                fill: document.getElementById('rpm-fill'),
+                valueText: document.getElementById('rpm-value'),
+                slider: document.getElementById('rpm-slider'),
+                sliderValueDisplay: document.getElementById('rpm-slider-value')
+            },
+        };
+
+        // References to quiz gauge elements (read-only, no sliders needed)
         const quizGauges = {
             p1: { needle: document.getElementById('quiz-p1-needle'), fill: document.getElementById('quiz-p1-fill'), valueText: document.getElementById('quiz-p1-value') },
             p2: { needle: document.getElementById('quiz-p2-needle'), fill: document.getElementById('quiz-p2-fill'), valueText: document.getElementById('quiz-p2-value') },
@@ -1047,7 +1182,7 @@
             "membrane_clot": {
                 name: "Membrane Lung Clot / Oxygenator Failure",
                 shortDescription: "A clot in the oxygenator increases resistance, leading to increased P2, decreased P3, high Delta P, and decreased flow.",
-                fullDescription: "When a clot forms within the oxygenator, it obstructs blood flow, increasing the pressure required to push blood into it (increased P2). Simultaneously, the pressure beyond the oxygenator drops (decreased P3) due to the increased resistance. This creates a significant increase in the pressure difference across the oxygenator (Delta P). Despite the pump maintaining its RPM, the overall blood flow through the circuit decreases.",
+                fullDescription: "When a clot forms within the oxygenator, it obstructs blood flow, increasing the pressure required to push blood into it (increased P2). Simultaneously, the pressure beyond the oxygenator drops (decreased P3) due to the increased resistance. This creates a significant increase in the pressure difference across the oxygenator (Delta P). Despite the pump maintaining its RPM, the actual blood flow through the circuit decreases.",
                 graphic: "🛑",
                 params: { p1: 'normal', p2: 'increased', p3: 'decreased', deltaP: 'increased', flow: 'decreased', rpm: 'normal' },
                 algorithm: `
@@ -1263,7 +1398,7 @@
                                 <span class="flowchart-result">Yes</span> → Go to step 3.
                             </div>
                             <div class="flowchart-answer">
-                                No → Recheck readings.
+                                No → Consider other pump issues.
                             </div>
                         </div>
                         <div class="flowchart-step">
@@ -1446,6 +1581,13 @@
         const quizPrevBtn = document.getElementById('quiz-prev-btn');
         const quizNextBtn = document.getElementById('quiz-next-btn');
 
+        // Modal elements
+        const quizCompletionModal = document.getElementById('quiz-completion-modal');
+        const finalScoreDisplay = document.getElementById('final-score-display');
+        const closeModalBtn = quizCompletionModal.querySelector('.close-modal-btn');
+        const restartQuizModalBtn = quizCompletionModal.querySelector('.restart-quiz-modal-btn');
+
+
         let currentQuizQuestionIndex = 0;
         let quizScore = 0;
         let userQuizAnswers = []; // To store selected answer index per question
@@ -1618,6 +1760,32 @@
             gauge.valueText.textContent = displayValue;
         }
 
+        /**
+         * Sets the slider's value and updates its display span.
+         * @param {Object} gaugeParam - The gauge parameter object (contains slider and sliderValueDisplay).
+         * @param {string} trend - The qualitative trend to set.
+         * @param {boolean} disabled - Whether the slider should be disabled.
+         */
+        function setSliderValue(gaugeParam, trend, disabled) {
+            const slider = gaugeParam.slider;
+            const sliderValueDisplay = gaugeParam.sliderValueDisplay;
+
+            if (slider && sliderValueDisplay) {
+                slider.value = trendToValueMap[trend];
+                sliderValueDisplay.textContent = trend.replace('_', ' ').toUpperCase();
+                slider.disabled = disabled;
+            }
+        }
+
+        /**
+         * Gets the qualitative trend from a slider's current value.
+         * @param {Object} gaugeParam - The gauge parameter object (contains slider).
+         * @returns {string} The qualitative trend string.
+         */
+        function getSliderValue(gaugeParam) {
+            const slider = gaugeParam.slider;
+            return slider ? valueToTrendMap[slider.value] : null;
+        }
 
         /**
          * Analyzes the ECMO parameters (all qualitative trends)
@@ -1765,24 +1933,16 @@
             const selectedScenarioKey = event.target.value;
             const scenario = scenarios[selectedScenarioKey];
 
-            // Get references to the individual parameter select elements
-            const p1Select = gauges.p1.select;
-            const p2Select = gauges.p2.select;
-            const p3Select = gauges.p3.select;
-            const deltaPSelect = gauges.deltaP.select;
-            const flowSelect = gauges.flow.select;
-            const rpmSelect = gauges.rpm.select;
-
-            // Function to update display and analysis based on current dropdown values
+            // Function to update display and analysis based on current control values
             const updateSimulatorDisplayAndAnalysis = () => {
-                const currentP1Trend = p1Select.value;
-                const currentP2Trend = p2Select.value;
-                const currentP3Trend = p3Select.value;
-                const currentDeltaPTrend = deltaPSelect.value;
-                const currentFlowTrend = flowSelect.value;
-                const currentRpmTrend = rpmSelect.value;
+                const currentP1Trend = getSliderValue(gauges.p1);
+                const currentP2Trend = getSliderValue(gauges.p2);
+                const currentP3Trend = getSliderValue(gauges.p3);
+                const currentDeltaPTrend = getSliderValue(gauges.deltaP);
+                const currentFlowTrend = getSliderValue(gauges.flow);
+                const currentRpmTrend = getSliderValue(gauges.rpm);
 
-                // Update gauge visuals based on current dropdown values
+                // Update gauge visuals based on current control values
                 updateGauge(gauges.p1, currentP1Trend);
                 updateGauge(gauges.p2, currentP2Trend);
                 updateGauge(gauges.p3, currentP3Trend);
@@ -1848,24 +2008,16 @@
                 }
             }; // End of updateSimulatorDisplayAndAnalysis function
 
-            // Set dropdown values and enable/disable them
-            p1Select.value = scenario.params.p1;
-            p2Select.value = scenario.params.p2;
-            p3Select.value = scenario.params.p3;
-            deltaPSelect.value = scenario.params.deltaP;
-            flowSelect.value = scenario.params.flow;
-            rpmSelect.value = scenario.params.rpm;
-
             const isCustom = selectedScenarioKey === 'custom';
             for (const key in gauges) {
-                if (gauges[key].select) { // Ensure the select element exists
-                    gauges[key].select.disabled = !isCustom;
-                    // Remove existing listeners to prevent multiple calls
-                    gauges[key].select.removeEventListener('change', updateSimulatorDisplayAndAnalysis);
-                    if (isCustom) {
-                        // Add listener only if in custom mode
-                        gauges[key].select.addEventListener('change', updateSimulatorDisplayAndAnalysis);
-                    }
+                // Set slider value and enable/disable it
+                setSliderValue(gauges[key], scenario.params[key], !isCustom);
+
+                // Remove existing listeners to prevent multiple calls
+                gauges[key].slider.removeEventListener('input', updateSimulatorDisplayAndAnalysis);
+                if (isCustom) {
+                    // Add listener only if in custom mode
+                    gauges[key].slider.addEventListener('input', updateSimulatorDisplayAndAnalysis);
                 }
             }
 
@@ -1981,21 +2133,30 @@
             quizScoreDisplay.textContent = `Score: ${quizScore} / 50`;
 
             if (currentQuizQuestionIndex === quizQuestions.length - 1 && userQuizAnswers[currentQuizQuestionIndex] !== undefined) {
-                // All questions answered, show final score
                 quizNextBtn.textContent = "Finish Quiz";
             } else {
                 quizNextBtn.textContent = "Next";
             }
         }
 
+        // --- Modal Functions ---
+        function showQuizCompletionModal() {
+            finalScoreDisplay.innerHTML = `Your total score: <strong>${quizScore} / 50</strong>`;
+            quizCompletionModal.classList.add('show');
+        }
+
+        function hideQuizCompletionModal() {
+            quizCompletionModal.classList.remove('show');
+        }
+
+        // --- Event Listeners ---
         quizNextBtn.addEventListener('click', () => {
             if (currentQuizQuestionIndex < quizQuestions.length - 1) {
                 currentQuizQuestionIndex++;
                 displayQuizQuestion();
             } else if (currentQuizQuestionIndex === quizQuestions.length - 1 && userQuizAnswers[currentQuizQuestionIndex] !== undefined) {
-                // Quiz finished, show final score summary (optional, could be a modal)
-                alert(`Quiz Finished! Your total score is: ${quizScore} / 50`);
-                // Optionally, reset quiz or show a summary screen
+                // Quiz finished, show final score modal
+                showQuizCompletionModal();
             }
         });
 
@@ -2022,6 +2183,17 @@
             // Reset simulator to normal operation when returning
             scenarioSelect.value = "normal_operation";
             scenarioSelect.dispatchEvent(new Event('change'));
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            hideQuizCompletionModal();
+            // Optionally, go back to simulator or just stay on quiz section
+            backToSimulatorBtn.click(); // Simulate click to go back to simulator
+        });
+
+        restartQuizModalBtn.addEventListener('click', () => {
+            hideQuizCompletionModal();
+            startQuizBtn.click(); // Simulate click to restart quiz
         });
 
 
